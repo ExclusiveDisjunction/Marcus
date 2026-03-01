@@ -6,11 +6,22 @@
 //
 
 import Testing
+import Marcus
+import CoreData
 
 struct MarcusTests {
 
-    @Test func example() async throws {
-        // Write your test here and use APIs like `#expect(...)` to check expected conditions.
+    @Test
+    func loadDebugStore() async throws {
+        let container = DataStack.shared.debugContainer;
+        
+        let count = try await container.viewContext.perform {
+            let appCount = try container.viewContext.count(for: JobApplication.fetchRequest());
+            
+            return appCount;
+        }
+        
+        #expect(count != 0);
     }
 
 }

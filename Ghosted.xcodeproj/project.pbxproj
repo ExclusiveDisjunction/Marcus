@@ -24,38 +24,38 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		DD10E6B72F549CDC0079483C /* Marcus.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Marcus.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		DD10E6CB2F549CDD0079483C /* MarcusTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MarcusTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		DD10E6D52F549CDD0079483C /* MarcusUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MarcusUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		DD10E6B72F549CDC0079483C /* Ghosted.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Ghosted.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		DD10E6CB2F549CDD0079483C /* GhostedTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = GhostedTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		DD10E6D52F549CDD0079483C /* GhostedUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = GhostedUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		DD10E6DD2F549CDD0079483C /* Exceptions for "Marcus" folder in "Marcus" target */ = {
+		DD25ADE32F54DC5F00711ED0 /* Exceptions for "Ghosted" folder in "Ghosted" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
 			);
-			target = DD10E6B62F549CDC0079483C /* Marcus */;
+			target = DD10E6B62F549CDC0079483C /* Ghosted */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		DD10E6B92F549CDC0079483C /* Marcus */ = {
+		DD10E6B92F549CDC0079483C /* Ghosted */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				DD10E6DD2F549CDD0079483C /* Exceptions for "Marcus" folder in "Marcus" target */,
+				DD25ADE32F54DC5F00711ED0 /* Exceptions for "Ghosted" folder in "Ghosted" target */,
 			);
-			path = Marcus;
+			path = Ghosted;
 			sourceTree = "<group>";
 		};
-		DD10E6CE2F549CDD0079483C /* MarcusTests */ = {
+		DD10E6CE2F549CDD0079483C /* GhostedTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = MarcusTests;
+			path = GhostedTests;
 			sourceTree = "<group>";
 		};
-		DD10E6D82F549CDD0079483C /* MarcusUITests */ = {
+		DD10E6D82F549CDD0079483C /* GhostedUITests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = MarcusUITests;
+			path = GhostedUITests;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -88,9 +88,9 @@
 		DD10E6AE2F549CDC0079483C = {
 			isa = PBXGroup;
 			children = (
-				DD10E6B92F549CDC0079483C /* Marcus */,
-				DD10E6CE2F549CDD0079483C /* MarcusTests */,
-				DD10E6D82F549CDD0079483C /* MarcusUITests */,
+				DD10E6B92F549CDC0079483C /* Ghosted */,
+				DD10E6CE2F549CDD0079483C /* GhostedTests */,
+				DD10E6D82F549CDD0079483C /* GhostedUITests */,
 				DD10E6B82F549CDC0079483C /* Products */,
 			);
 			sourceTree = "<group>";
@@ -98,9 +98,9 @@
 		DD10E6B82F549CDC0079483C /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				DD10E6B72F549CDC0079483C /* Marcus.app */,
-				DD10E6CB2F549CDD0079483C /* MarcusTests.xctest */,
-				DD10E6D52F549CDD0079483C /* MarcusUITests.xctest */,
+				DD10E6B72F549CDC0079483C /* Ghosted.app */,
+				DD10E6CB2F549CDD0079483C /* GhostedTests.xctest */,
+				DD10E6D52F549CDD0079483C /* GhostedUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -108,9 +108,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		DD10E6B62F549CDC0079483C /* Marcus */ = {
+		DD10E6B62F549CDC0079483C /* Ghosted */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = DD10E6DE2F549CDD0079483C /* Build configuration list for PBXNativeTarget "Marcus" */;
+			buildConfigurationList = DD10E6DE2F549CDD0079483C /* Build configuration list for PBXNativeTarget "Ghosted" */;
 			buildPhases = (
 				DD10E6B32F549CDC0079483C /* Sources */,
 				DD10E6B42F549CDC0079483C /* Frameworks */,
@@ -121,18 +121,18 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				DD10E6B92F549CDC0079483C /* Marcus */,
+				DD10E6B92F549CDC0079483C /* Ghosted */,
 			);
-			name = Marcus;
+			name = Ghosted;
 			packageProductDependencies = (
 			);
 			productName = Marcus;
-			productReference = DD10E6B72F549CDC0079483C /* Marcus.app */;
+			productReference = DD10E6B72F549CDC0079483C /* Ghosted.app */;
 			productType = "com.apple.product-type.application";
 		};
-		DD10E6CA2F549CDD0079483C /* MarcusTests */ = {
+		DD10E6CA2F549CDD0079483C /* GhostedTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = DD10E6E32F549CDD0079483C /* Build configuration list for PBXNativeTarget "MarcusTests" */;
+			buildConfigurationList = DD10E6E32F549CDD0079483C /* Build configuration list for PBXNativeTarget "GhostedTests" */;
 			buildPhases = (
 				DD10E6C72F549CDD0079483C /* Sources */,
 				DD10E6C82F549CDD0079483C /* Frameworks */,
@@ -144,18 +144,18 @@
 				DD10E6CD2F549CDD0079483C /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
-				DD10E6CE2F549CDD0079483C /* MarcusTests */,
+				DD10E6CE2F549CDD0079483C /* GhostedTests */,
 			);
-			name = MarcusTests;
+			name = GhostedTests;
 			packageProductDependencies = (
 			);
 			productName = MarcusTests;
-			productReference = DD10E6CB2F549CDD0079483C /* MarcusTests.xctest */;
+			productReference = DD10E6CB2F549CDD0079483C /* GhostedTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		DD10E6D42F549CDD0079483C /* MarcusUITests */ = {
+		DD10E6D42F549CDD0079483C /* GhostedUITests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = DD10E6E62F549CDD0079483C /* Build configuration list for PBXNativeTarget "MarcusUITests" */;
+			buildConfigurationList = DD10E6E62F549CDD0079483C /* Build configuration list for PBXNativeTarget "GhostedUITests" */;
 			buildPhases = (
 				DD10E6D12F549CDD0079483C /* Sources */,
 				DD10E6D22F549CDD0079483C /* Frameworks */,
@@ -167,13 +167,13 @@
 				DD10E6D72F549CDD0079483C /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
-				DD10E6D82F549CDD0079483C /* MarcusUITests */,
+				DD10E6D82F549CDD0079483C /* GhostedUITests */,
 			);
-			name = MarcusUITests;
+			name = GhostedUITests;
 			packageProductDependencies = (
 			);
 			productName = MarcusUITests;
-			productReference = DD10E6D52F549CDD0079483C /* MarcusUITests.xctest */;
+			productReference = DD10E6D52F549CDD0079483C /* GhostedUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
 /* End PBXNativeTarget section */
@@ -199,7 +199,7 @@
 					};
 				};
 			};
-			buildConfigurationList = DD10E6B22F549CDC0079483C /* Build configuration list for PBXProject "Marcus" */;
+			buildConfigurationList = DD10E6B22F549CDC0079483C /* Build configuration list for PBXProject "Ghosted" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -213,9 +213,9 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				DD10E6B62F549CDC0079483C /* Marcus */,
-				DD10E6CA2F549CDD0079483C /* MarcusTests */,
-				DD10E6D42F549CDD0079483C /* MarcusUITests */,
+				DD10E6B62F549CDC0079483C /* Ghosted */,
+				DD10E6CA2F549CDD0079483C /* GhostedTests */,
+				DD10E6D42F549CDD0079483C /* GhostedUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -271,12 +271,12 @@
 /* Begin PBXTargetDependency section */
 		DD10E6CD2F549CDD0079483C /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = DD10E6B62F549CDC0079483C /* Marcus */;
+			target = DD10E6B62F549CDC0079483C /* Ghosted */;
 			targetProxy = DD10E6CC2F549CDD0079483C /* PBXContainerItemProxy */;
 		};
 		DD10E6D72F549CDD0079483C /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = DD10E6B62F549CDC0079483C /* Marcus */;
+			target = DD10E6B62F549CDC0079483C /* Ghosted */;
 			targetProxy = DD10E6D62F549CDD0079483C /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -287,7 +287,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = Marcus/Marcus.entitlements;
+				CODE_SIGN_ENTITLEMENTS = Ghosted/Ghosted.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 8QF4NKZP3V;
@@ -306,8 +306,8 @@
 				ENABLE_RESOURCE_ACCESS_USB = NO;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = Marcus/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = Marcus;
+				INFOPLIST_FILE = Ghosted/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Ghosted;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -323,7 +323,7 @@
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 15.0;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.exdisj.Marcus;
+				PRODUCT_BUNDLE_IDENTIFIER = com.exdisj.Ghosted;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
 				SDKROOT = auto;
@@ -345,7 +345,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = Marcus/Marcus.entitlements;
+				CODE_SIGN_ENTITLEMENTS = Ghosted/Ghosted.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 8QF4NKZP3V;
@@ -364,8 +364,8 @@
 				ENABLE_RESOURCE_ACCESS_USB = NO;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = Marcus/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = Marcus;
+				INFOPLIST_FILE = Ghosted/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Ghosted;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -381,7 +381,7 @@
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 15.0;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.exdisj.Marcus;
+				PRODUCT_BUNDLE_IDENTIFIER = com.exdisj.Ghosted;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
 				SDKROOT = auto;
@@ -619,7 +619,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		DD10E6B22F549CDC0079483C /* Build configuration list for PBXProject "Marcus" */ = {
+		DD10E6B22F549CDC0079483C /* Build configuration list for PBXProject "Ghosted" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				DD10E6E12F549CDD0079483C /* Debug */,
@@ -628,7 +628,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		DD10E6DE2F549CDD0079483C /* Build configuration list for PBXNativeTarget "Marcus" */ = {
+		DD10E6DE2F549CDD0079483C /* Build configuration list for PBXNativeTarget "Ghosted" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				DD10E6DF2F549CDD0079483C /* Debug */,
@@ -637,7 +637,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		DD10E6E32F549CDD0079483C /* Build configuration list for PBXNativeTarget "MarcusTests" */ = {
+		DD10E6E32F549CDD0079483C /* Build configuration list for PBXNativeTarget "GhostedTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				DD10E6E42F549CDD0079483C /* Debug */,
@@ -646,7 +646,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		DD10E6E62F549CDD0079483C /* Build configuration list for PBXNativeTarget "MarcusUITests" */ = {
+		DD10E6E62F549CDD0079483C /* Build configuration list for PBXNativeTarget "GhostedUITests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				DD10E6E72F549CDD0079483C /* Debug */,

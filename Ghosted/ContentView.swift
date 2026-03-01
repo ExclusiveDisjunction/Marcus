@@ -1,6 +1,6 @@
 //
 //  ContentView.swift
-//  Marcus
+//  Ghosted
 //
 //  Created by Hollan Sellars on 3/1/26.
 //
@@ -12,7 +12,9 @@ struct ContentView: View {
     @Environment(\.managedObjectContext) private var viewContext
 
     var body: some View {
-        AllApplications()
+        NavigationStack {
+            AllApplications()
+        }
     }
 
 }

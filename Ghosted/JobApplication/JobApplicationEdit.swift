@@ -1,6 +1,6 @@
 //
 //  JobApplicationInspect.swift
-//  Marcus
+//  Ghosted
 //
 //  Created by Hollan Sellars on 3/1/26.
 //
@@ -10,13 +10,11 @@ import SwiftUI
 public struct JobApplicationEdit : View {
     public init(_ source: JobApplication) {
         self._source = .init(wrappedValue: source);
-        self._location = .init(source, \.location, "")
     }
     
     @State private var hasUrl: Bool = false;
     @State private var rawUrl: String = "";
     @State private var urlError = false;
-    @NullableValue<JobApplication, String> private var location: Binding<Bool>;
     
     @ObservedObject private var source: JobApplication;
     
@@ -35,12 +33,14 @@ public struct JobApplicationEdit : View {
                     Text("Position:").frame(minWidth: minWidth, maxWidth: maxWidth, alignment: .trailing)
                     
                     TextField("Position", text: $source.position)
+                        .textFieldStyle(.roundedBorder)
                 }
                 
                 GridRow {
                     Text("Company:").frame(minWidth: minWidth, maxWidth: maxWidth, alignment: .trailing)
                     
                     TextField("Company", text: $source.company)
+                        .textFieldStyle(.roundedBorder)
                 }
                 
                 GridRow {
@@ -61,30 +61,23 @@ public struct JobApplicationEdit : View {
                     EnumPicker(value: $source.state)
                 }
                 
-                
                 GridRow {
-                    Text("Has Location?")
+                    Text("Position Kind:")
                         .frame(minWidth: minWidth, maxWidth: maxWidth, alignment: .trailing)
                     
-                    HStack {
-                        Toggle("", isOn: location)
-                            .labelsHidden()
-                        
-                        Spacer()
-                    }
-                }
-                
-                if location.wrappedValue {
-                    GridRow {
-                        Text("Location:")
-                            .frame(minWidth: minWidth, maxWidth: maxWidth, alignment: .trailing)
-                        
-                        TextField("Location", text: $location)
-                    }
+                    EnumPicker(value: $source.kind)
                 }
                 
                 GridRow {
-                    Text("Location Kind:")
+                    Text("Location:")
+                        .frame(minWidth: minWidth, maxWidth: maxWidth, alignment: .trailing)
+                    
+                    TextField("Location", text: $source.location)
+                        .textFieldStyle(.roundedBorder)
+                }
+                
+                GridRow {
+                    Text("Job Kind:")
                         .frame(minWidth: minWidth, maxWidth: maxWidth, alignment: .trailing)
                     
                     EnumPicker(value: $source.locationKind)
@@ -108,6 +101,7 @@ public struct JobApplicationEdit : View {
                             .frame(minWidth: minWidth, maxWidth: maxWidth, alignment: .trailing)
                         
                         TextField("Location", text: $rawUrl)
+                            .textFieldStyle(.roundedBorder)
                             .onChange(of: rawUrl) { _, raw in
                                 guard let url = URL(string: raw) else {
                                     urlError = true
@@ -150,6 +144,7 @@ public struct JobApplicationEdit : View {
                         .frame(minWidth: minWidth, maxWidth: maxWidth, alignment: .trailing)
                     
                     TextField("Notes", text: $source.notes)
+                        .textFieldStyle(.roundedBorder)
                 }
             }.padding()
         }

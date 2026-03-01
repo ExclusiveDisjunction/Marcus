@@ -6,10 +6,10 @@
 //
 
 import Testing
-import Marcus
+import Ghosted
 import CoreData
 
-struct MarcusTests {
+struct GhostedTests {
 
     @Test
     func loadDebugStore() async throws {

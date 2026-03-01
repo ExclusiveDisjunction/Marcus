@@ -18,10 +18,6 @@ public struct SingularContextMenu<T> : View where T: Identifiable {
     private var delete: DeletingManifest<T>;
     /// Signifies that the context menu allows for view inspection
     private let canInspect: Bool;
-    /// An optional function called that signals the add operation.
-    private let add: (() -> Void)?;
-    /// A label that is shown for the add functionality, if the `add` member exists.
-    private let addLabel: LocalizedStringKey;
     /// Signals that the view uses the Slide style.
     private let asSlide: Bool;
     
@@ -34,41 +30,33 @@ public struct SingularContextMenu<T> : View where T: Identifiable {
     ///     - add: A method that will add a new `T` to the data store. If this is `nil`, then adding is disallowed.
     ///     - canInspect: If the `target` can be inspected or not.
     ///     - asSlide: When true, the menu will be presented as a slide menu, with tinted colors.
-    public init(_ target: T, inspect: InspectionManifest<T>, remove: DeletingManifest<T>, addLabel: LocalizedStringKey = "Add", add: (() -> Void)? = nil, canInspect: Bool = true, asSlide: Bool = false) {
+    public init(_ target: T, inspect: InspectionManifest<T>, remove: DeletingManifest<T>, canInspect: Bool = true, asSlide: Bool) {
         self.target = target
         self.inspection = inspect
         self.canInspect = canInspect
         self.delete = remove
-        self.add = add
-        self.addLabel = addLabel
         self.asSlide = asSlide
     }
     
     public var body: some View {
-        if let add = add {
-            Button(action: add) {
-                Label(addLabel, systemImage: "plus")
-            }
-        }
-        
         if canInspect {
             Button {
                 inspection.open(value: target, editing: false)
             } label: {
-                Label("Inspect", systemImage: "info.circle")
+                Image(systemName: "info.circle")
             }.tint(asSlide ? .green : .clear)
         }
         
         Button {
-            inspection.open(value: target, editing: false)
+            inspection.open(value: target, editing: true)
         } label: {
-            Label("Edit", systemImage: "pencil")
+            Image(systemName: "pencil")
         }.tint(asSlide ? .blue : .clear)
         
         Button {
             delete.action = [target]
         } label: {
-            Label("Delete", systemImage: "trash").foregroundStyle(.red)
+            Image(systemName: "trash").foregroundStyle(.red)
         }.tint(asSlide ? .red : .clear)
     }
 }

@@ -1,17 +1,27 @@
 //
 //  JobStats.swift
-//  Marcus
+//  Ghosted
 //
 //  Created by Hollan Sellars on 3/1/26.
 //
 
 import SwiftUI
 import CoreData
+import Charts
 
 public struct JobStats : Sendable {
     
     public let counts: [(JobApplicationState, Int)];
     public let totalCount: Int;
+}
+
+extension JobApplicationState : Plottable {
+    public var primitivePlottable: Int16 {
+        self.rawValue
+    }
+    public init?(primitivePlottable: PrimitivePlottable) {
+        self.init(rawValue: primitivePlottable)
+    }
 }
 
 public struct JobStatsViewer : View {
@@ -38,7 +48,7 @@ public struct JobStatsViewer : View {
                 totalCount += 1;
             }
             
-            return JobStats(counts: Array(counts), totalCount: totalCount)
+            return JobStats(counts: Array(counts).sorted(using: KeyPathComparator(\.value)), totalCount: totalCount)
         };
         
         return stats;
@@ -73,6 +83,29 @@ public struct JobStatsViewer : View {
                         Text(count, format: .number)
                     }
                 }
+                
+                Divider()
+                    .padding(.bottom, 25)
+                
+                Chart {
+                    /*
+                     SectorPlot(
+                     stats.counts,
+                     angle: .value("Count", \.1),
+                     angularInset: 2
+                     ).foregroundStyle(
+                     by: .value("State", \.0)
+                     )
+                     */
+                    ForEach(stats.counts, id: \.0.rawValue) { (state, count) in
+                        SectorMark(angle: .value("Count", count), angularInset: 2)
+                            .foregroundStyle(by: .value("State", state))
+                            .annotation(position: .automatic) {
+                                Text(state.display)
+                            }
+                    }
+                }.chartLegend(.visible)
+                    .frame(minHeight: 200)
             }
             else {
                 ProgressView(label: { Text("Loading Statistics") } )

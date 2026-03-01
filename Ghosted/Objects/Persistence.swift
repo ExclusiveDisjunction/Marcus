@@ -1,6 +1,6 @@
 //
 //  Persistence.swift
-//  Marcus
+//  Ghosted
 //
 //  Created by Hollan Sellars on 3/1/26.
 //
@@ -24,7 +24,7 @@ public struct DebugContainerFiller : ContainerDataFiller {
         app1.company = "ExDisj";
         app1.kind = .fullTime;
         app1.locationKind = .remote;
-        app1.location = nil;
+        app1.location = "";
         app1.position = "Junior Developer";
         app1.state = .underReview;
         
@@ -41,6 +41,7 @@ public struct DebugContainerFiller : ContainerDataFiller {
 
 public class DataStack : ObservableObject, @unchecked Sendable {
     public static let shared: DataStack = DataStack()
+    public static let containerName = "Ghosted";
     
     private var _persistentContainer: NSPersistentCloudKitContainer? = nil;
     private var _debugContainer: NSPersistentContainer? = nil;
@@ -56,7 +57,7 @@ public class DataStack : ObservableObject, @unchecked Sendable {
                 return container;
             }
             
-            let container = NSPersistentCloudKitContainer(name: "Marcus");
+            let container = NSPersistentCloudKitContainer(name: Self.containerName);
             
             container.loadPersistentStores { _, error in
                 if let error {
@@ -78,7 +79,7 @@ public class DataStack : ObservableObject, @unchecked Sendable {
                 return container;
             }
             
-            let container = NSPersistentContainer(name: "Marcus");
+            let container = NSPersistentContainer(name: Self.containerName);
             
             let desc = NSPersistentStoreDescription();
             desc.type = NSInMemoryStoreType;
@@ -113,12 +114,12 @@ public class DataStack : ObservableObject, @unchecked Sendable {
             let bundle = Bundle(for: DataStack.self);
             
             guard
-                let modelURL = bundle.url(forResource: "ModelsV1", withExtension: "mom"),
+                let modelURL = bundle.url(forResource: Self.containerName, withExtension: "mom"),
                 let model = NSManagedObjectModel(contentsOf: modelURL) else {
                 fatalError("Unable to load the managed object model.");
             }
             
-            let container = NSPersistentContainer(name: "ModelsV1", managedObjectModel: model);
+            let container = NSPersistentContainer(name: Self.containerName, managedObjectModel: model);
             
             let desc = NSPersistentStoreDescription();
             desc.type = NSInMemoryStoreType;

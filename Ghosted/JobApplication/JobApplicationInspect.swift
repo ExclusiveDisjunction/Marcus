@@ -1,6 +1,6 @@
 //
 //  JobApplicationEdit.swift
-//  Marcus
+//  Ghosted
 //
 //  Created by Hollan Sellars on 3/1/26.
 //
@@ -65,17 +65,27 @@ public struct JobApplicationInspect : View {
             }
             
             GridRow {
-                Text("Location:")
+                Text("Position Kind:")
                     .frame(minWidth: minWidth, maxWidth: maxWidth, alignment: .trailing)
                 
                 HStack {
-                    Text(verbatim: source.location ?? "-")
+                    DisplayableVisualizer(value: source.kind)
                     Spacer()
                 }
             }
             
             GridRow {
-                Text("Location Kind:")
+                Text("Location:")
+                    .frame(minWidth: minWidth, maxWidth: maxWidth, alignment: .trailing)
+                
+                HStack {
+                    Text(verbatim: source.location)
+                    Spacer()
+                }
+            }
+            
+            GridRow {
+                Text("Job Kind:")
                     .frame(minWidth: minWidth, maxWidth: maxWidth, alignment: .trailing)
                 
                 HStack {

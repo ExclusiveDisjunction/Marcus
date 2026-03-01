@@ -1,6 +1,6 @@
 //
 //  JobApplication.swift
-//  Marcus
+//  Ghosted
 //
 //  Created by Hollan Sellars on 3/1/26.
 //
@@ -14,6 +14,7 @@ public enum JobApplicationState : Int16, Equatable, Hashable, Codable, Sendable,
     case inInterview = 2
     case rejected = 3
     case accepted = 4
+    case ghosted = 5
     
     public var id: Self { self }
     
@@ -23,11 +24,13 @@ public enum JobApplicationState : Int16, Equatable, Hashable, Codable, Sendable,
             case .underReview:
                 fallthrough
             case .inInterview:
-                Color.yellow
+                Color.blue
             case .rejected:
                 Color.red
             case .accepted:
                 Color.green
+            case .ghosted:
+                Color.gray
         }
     }
 }
@@ -39,6 +42,7 @@ extension JobApplicationState : Displayable {
             case .inInterview: "In Interview"
             case .rejected: "Rejected"
             case .accepted: "Accepted"
+            case .ghosted: "Ghosted"
         }
     }
 }
@@ -87,6 +91,10 @@ public extension JobApplication {
     var company: String {
         get { self.internalCompany ?? String() }
         set { self.internalCompany = newValue }
+    }
+    var location: String {
+        get { self.internalLocation ?? String() }
+        set { self.internalLocation = newValue }
     }
     var appliedOn: Date {
         get { self.internalAppliedOn ?? .distantPast }

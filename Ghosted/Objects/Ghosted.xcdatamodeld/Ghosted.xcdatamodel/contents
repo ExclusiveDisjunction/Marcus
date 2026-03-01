@@ -4,11 +4,12 @@
         <attribute name="internalAppliedOn" attributeType="Date" defaultDateTimeInterval="794074440" usesScalarValueType="NO"/>
         <attribute name="internalCompany" attributeType="String" defaultValueString=""/>
         <attribute name="internalKind" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="internalLastStatusUpdated" optional="YES" attributeType="Date" defaultDateTimeInterval="794092800" usesScalarValueType="NO"/>
+        <attribute name="internalLocation" optional="YES" attributeType="String" defaultValueString=""/>
         <attribute name="internalLocationKind" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="internalNotes" attributeType="String" defaultValueString=""/>
         <attribute name="internalPosition" attributeType="String" defaultValueString=""/>
         <attribute name="internalState" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
-        <attribute name="location" optional="YES" attributeType="String" defaultValueString=""/>
         <attribute name="website" optional="YES" attributeType="URI"/>
     </entity>
 </model>

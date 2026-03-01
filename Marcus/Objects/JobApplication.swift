@@ -8,12 +8,28 @@
 import SwiftUI
 import CoreData
 
-public enum JobApplicationState : Int16, Equatable, Hashable, Codable, Sendable {
+public enum JobApplicationState : Int16, Equatable, Hashable, Codable, Sendable, CaseIterable, Identifiable {
     case applied = 0
     case underReview = 1
     case inInterview = 2
     case rejected = 3
     case accepted = 4
+    
+    public var id: Self { self }
+    
+    public var color: Color {
+        switch self {
+            case .applied: Color.primary
+            case .underReview:
+                fallthrough
+            case .inInterview:
+                Color.yellow
+            case .rejected:
+                Color.red
+            case .accepted:
+                Color.green
+        }
+    }
 }
 extension JobApplicationState : Displayable {
     public var display: LocalizedStringKey {
@@ -27,10 +43,12 @@ extension JobApplicationState : Displayable {
     }
 }
 
-public enum JobLocation : Int16, Equatable, Hashable, Codable, Sendable {
+public enum JobLocation : Int16, Equatable, Hashable, Codable, Sendable, CaseIterable, Identifiable {
     case onSite = 0
     case hybrid = 1
     case remote = 2
+    
+    public var id: Self { self }
 }
 extension JobLocation : Displayable {
     public var display: LocalizedStringKey {
@@ -42,11 +60,13 @@ extension JobLocation : Displayable {
     }
 }
 
-public enum JobKind : Int16, Equatable, Hashable, Codable, Sendable {
+public enum JobKind : Int16, Equatable, Hashable, Codable, Sendable, CaseIterable, Identifiable {
     case fullTime = 0
     case partTime = 1
     case seasonal = 2
     case contractor = 3
+    
+    public var id: Self { self }
 }
 extension JobKind : Displayable {
     public var display: LocalizedStringKey {

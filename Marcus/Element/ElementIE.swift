@@ -251,7 +251,7 @@ public struct ElementIE<T> : View where T: InspectableElement & EditableElement 
             }.buttonStyle(.borderless)
                 .scaledToFit()
                 .frame(width: 20, height: 20)
-                .disabled(canChangeState) //you cannot change mode if the data is not stored.
+                .disabled(!canChangeState) //you cannot change mode if the data is not stored.
 #if os(iOS)
                 .padding(.bottom)
 #endif

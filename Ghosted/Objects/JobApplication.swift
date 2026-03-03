@@ -7,6 +7,7 @@
 
 import SwiftUI
 import CoreData
+import ExDisj
 
 /// The state of an application, specifically, which stage of the job application process the job is in.
 public enum JobApplicationState : Int16, Equatable, Hashable, Codable, Sendable, CaseIterable, Identifiable {

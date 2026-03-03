@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		DD72BF0D2F56A22B009002F1 /* ExDisj in Frameworks */ = {isa = PBXBuildFile; productRef = DD72BF0C2F56A22B009002F1 /* ExDisj */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		DD10E6CC2F549CDD0079483C /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -67,6 +71,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DD72BF0D2F56A22B009002F1 /* ExDisj in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -118,6 +123,7 @@
 			);
 			name = Ghosted;
 			packageProductDependencies = (
+				DD72BF0C2F56A22B009002F1 /* ExDisj */,
 			);
 			productName = Marcus;
 			productReference = DD10E6B72F549CDC0079483C /* Ghosted.app */;
@@ -174,6 +180,9 @@
 			);
 			mainGroup = DD10E6AE2F549CDC0079483C;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				DD72BF0B2F56A22B009002F1 /* XCLocalSwiftPackageReference "../ExDisj-Swift" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = DD10E6B82F549CDC0079483C /* Products */;
 			projectDirPath = "";
@@ -547,6 +556,20 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		DD72BF0B2F56A22B009002F1 /* XCLocalSwiftPackageReference "../ExDisj-Swift" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = "../ExDisj-Swift";
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		DD72BF0C2F56A22B009002F1 /* ExDisj */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = ExDisj;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = DD10E6AF2F549CDC0079483C /* Project object */;
 }

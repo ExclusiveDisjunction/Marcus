@@ -8,6 +8,7 @@
 import SwiftUI
 import CoreData
 import Charts
+import ExDisj
 
 /// Computed set of job applications status.
 public struct JobStats : Sendable {

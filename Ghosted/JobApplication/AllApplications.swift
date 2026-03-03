@@ -7,6 +7,7 @@
 
 import SwiftUI
 import CoreData
+import ExDisj
 
 /// A view that provides an overview of all job applications, with the ability to filter, search, and provide statistics.
 public struct AllApplications : View {
@@ -86,7 +87,7 @@ public struct AllApplications : View {
             }
             .withWarning(warning)
             .withElementDeleting(manifest: delete)
-            .withElementIE(manifest: inspect) { app in
+            .withElementIE(manifest: inspect, using: DataStack.shared.currentContainer) { app in
                 app.position = "";
                 app.company = "";
                 app.appliedOn = .now;

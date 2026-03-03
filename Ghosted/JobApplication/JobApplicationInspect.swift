@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import ExDisj
 
 /// A view that allows for the inspection of a ``JobApplication``
 public struct JobApplicationInspect : View {

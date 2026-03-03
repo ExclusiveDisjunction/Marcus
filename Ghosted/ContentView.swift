@@ -19,6 +19,7 @@ struct ContentView: View {
 
 }
 
+@available(macOS 15, iOS 18, *)
 #Preview(traits: .sampleData) {
     ContentView()
 }

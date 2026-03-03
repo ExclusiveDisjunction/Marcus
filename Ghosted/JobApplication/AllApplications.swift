@@ -8,6 +8,7 @@
 import SwiftUI
 import CoreData
 
+/// A view that provides an overview of all job applications, with the ability to filter, search, and provide statistics.
 public struct AllApplications : View {
     
     @QuerySelection<JobApplication>(sortDescriptors: [SortDescriptor(\JobApplication.internalAppliedOn)])
@@ -26,6 +27,7 @@ public struct AllApplications : View {
     private var filterState = ApplicationsFilterState();
     @StateObject private var searchState = ApplicationsSearchState();
     
+    /// Fetches the latest predicates from the filtering and searching.
     private func preparePredicate() {
         let filterPred = filterState.preparePredicate();
         
@@ -144,6 +146,7 @@ public struct AllApplications : View {
     }
 }
 
+@available(macOS 15, iOS 18, *)
 #Preview(traits: .sampleData) {
     AllApplications()
 }

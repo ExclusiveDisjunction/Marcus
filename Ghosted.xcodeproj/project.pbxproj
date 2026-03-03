@@ -14,19 +14,11 @@
 			remoteGlobalIDString = DD10E6B62F549CDC0079483C;
 			remoteInfo = Marcus;
 		};
-		DD10E6D62F549CDD0079483C /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = DD10E6AF2F549CDC0079483C /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = DD10E6B62F549CDC0079483C;
-			remoteInfo = Marcus;
-		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		DD10E6B72F549CDC0079483C /* Ghosted.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Ghosted.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DD10E6CB2F549CDD0079483C /* GhostedTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = GhostedTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		DD10E6D52F549CDD0079483C /* GhostedUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = GhostedUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -68,11 +60,6 @@
 			path = GhostedTests;
 			sourceTree = "<group>";
 		};
-		DD10E6D82F549CDD0079483C /* GhostedUITests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = GhostedUITests;
-			sourceTree = "<group>";
-		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -90,13 +77,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		DD10E6D22F549CDD0079483C /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -105,7 +85,6 @@
 			children = (
 				DD10E6B92F549CDC0079483C /* Ghosted */,
 				DD10E6CE2F549CDD0079483C /* GhostedTests */,
-				DD10E6D82F549CDD0079483C /* GhostedUITests */,
 				DD10E6B82F549CDC0079483C /* Products */,
 			);
 			sourceTree = "<group>";
@@ -115,7 +94,6 @@
 			children = (
 				DD10E6B72F549CDC0079483C /* Ghosted.app */,
 				DD10E6CB2F549CDD0079483C /* GhostedTests.xctest */,
-				DD10E6D52F549CDD0079483C /* GhostedUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -168,29 +146,6 @@
 			productReference = DD10E6CB2F549CDD0079483C /* GhostedTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		DD10E6D42F549CDD0079483C /* GhostedUITests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = DD10E6E62F549CDD0079483C /* Build configuration list for PBXNativeTarget "GhostedUITests" */;
-			buildPhases = (
-				DD10E6D12F549CDD0079483C /* Sources */,
-				DD10E6D22F549CDD0079483C /* Frameworks */,
-				DD10E6D32F549CDD0079483C /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				DD10E6D72F549CDD0079483C /* PBXTargetDependency */,
-			);
-			fileSystemSynchronizedGroups = (
-				DD10E6D82F549CDD0079483C /* GhostedUITests */,
-			);
-			name = GhostedUITests;
-			packageProductDependencies = (
-			);
-			productName = MarcusUITests;
-			productReference = DD10E6D52F549CDD0079483C /* GhostedUITests.xctest */;
-			productType = "com.apple.product-type.bundle.ui-testing";
-		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -205,10 +160,6 @@
 						CreatedOnToolsVersion = 26.3;
 					};
 					DD10E6CA2F549CDD0079483C = {
-						CreatedOnToolsVersion = 26.3;
-						TestTargetID = DD10E6B62F549CDC0079483C;
-					};
-					DD10E6D42F549CDD0079483C = {
 						CreatedOnToolsVersion = 26.3;
 						TestTargetID = DD10E6B62F549CDC0079483C;
 					};
@@ -230,7 +181,6 @@
 			targets = (
 				DD10E6B62F549CDC0079483C /* Ghosted */,
 				DD10E6CA2F549CDD0079483C /* GhostedTests */,
-				DD10E6D42F549CDD0079483C /* GhostedUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -244,13 +194,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		DD10E6C92F549CDD0079483C /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		DD10E6D32F549CDD0079483C /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -274,13 +217,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		DD10E6D12F549CDD0079483C /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -288,11 +224,6 @@
 			isa = PBXTargetDependency;
 			target = DD10E6B62F549CDC0079483C /* Ghosted */;
 			targetProxy = DD10E6CC2F549CDD0079483C /* PBXContainerItemProxy */;
-		};
-		DD10E6D72F549CDD0079483C /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = DD10E6B62F549CDC0079483C /* Ghosted */;
-			targetProxy = DD10E6D62F549CDD0079483C /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -334,10 +265,10 @@
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.exdisj.Ghosted;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -393,10 +324,10 @@
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.exdisj.Ghosted;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -585,56 +516,6 @@
 			};
 			name = Release;
 		};
-		DD10E6E72F549CDD0079483C /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 8QF4NKZP3V;
-				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
-				MACOSX_DEPLOYMENT_TARGET = 26.2;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.exdisj.MarcusUITests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = auto;
-				STRING_CATALOG_GENERATE_SYMBOLS = NO;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
-				SWIFT_APPROACHABLE_CONCURRENCY = YES;
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2,7";
-				TEST_TARGET_NAME = Marcus;
-				XROS_DEPLOYMENT_TARGET = 26.2;
-			};
-			name = Debug;
-		};
-		DD10E6E82F549CDD0079483C /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 8QF4NKZP3V;
-				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
-				MACOSX_DEPLOYMENT_TARGET = 26.2;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.exdisj.MarcusUITests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = auto;
-				STRING_CATALOG_GENERATE_SYMBOLS = NO;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
-				SWIFT_APPROACHABLE_CONCURRENCY = YES;
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2,7";
-				TEST_TARGET_NAME = Marcus;
-				XROS_DEPLOYMENT_TARGET = 26.2;
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -661,15 +542,6 @@
 			buildConfigurations = (
 				DD10E6E42F549CDD0079483C /* Debug */,
 				DD10E6E52F549CDD0079483C /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		DD10E6E62F549CDD0079483C /* Build configuration list for PBXNativeTarget "GhostedUITests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				DD10E6E72F549CDD0079483C /* Debug */,
-				DD10E6E82F549CDD0079483C /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

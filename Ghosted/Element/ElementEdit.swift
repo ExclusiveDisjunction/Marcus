@@ -13,9 +13,9 @@ import os
 public struct ElementEditor<M, T> : View where M: EditableElementManifest, T: TypeTitled & EditableElement, M.Target == T {
     /// Constructs the view using the specified data.
     /// - Parameters:
-    ///     - data: The element to modify. A `T.Snapshot` will be created for it.
-    ///     - adding: When true, the editor will understand that the `data` provided is new. Therefore, it will append it to the `ModelContext` upon successful save.
-    ///     - postAction: If provided, this will be called when the editor closes, regardless of saving or not.
+    ///     - manifest: The ``EditableElementManifest`` manifest used to source information.
+    ///     - title: The title of the editor from a ``TypeTitleStrings`` value.
+    ///     - postAction: An optional action to run after successfuly saving the data.
     public init(manifest: M, title: KeyPath<TypeTitleStrings, LocalizedStringKey>, postAction: (() -> Void)? = nil) {
         self.manifest = manifest;
         self.postAction = postAction
@@ -32,6 +32,7 @@ public struct ElementEditor<M, T> : View where M: EditableElementManifest, T: Ty
     @Environment(\.managedObjectContext) private var cx;
     @Environment(\.dismiss) private var dismiss;
     
+    /// Cancels out the editing.
     private func cancel() {
         manifest.reset();
         dismiss();
@@ -91,6 +92,11 @@ public struct ElementEditor<M, T> : View where M: EditableElementManifest, T: Ty
     }
 }
 extension ElementEditor where M == ElementAddManifest<T> {
+    /// Constructs the editor in adding mode.
+    /// - Parameters:
+    ///     - using: The container to source information from.
+    ///     - filling: A routine that sets up default values for `T`.
+    ///     - postAction: An optional action to run after successfuly saving the data.
     public init(using: NSPersistentContainer, filling: @MainActor (T) -> Void, postAction: (() -> Void)? = nil ) {
         self.init(
             manifest: .init(using: using, filling: filling),
@@ -98,6 +104,10 @@ extension ElementEditor where M == ElementAddManifest<T> {
             postAction: postAction
         )
     }
+    /// Constructs the editor in adding mode.
+    /// - Parameters:
+    ///     - addManifest: The ``ElementAddManifest`` to source information from.
+    ///     - postAction: An optional action to run after successfuly saving the data.
     public init(addManifest: ElementAddManifest<T>, postAction: (() -> Void)? = nil) {
         self.init(
             manifest: addManifest,
@@ -107,6 +117,11 @@ extension ElementEditor where M == ElementAddManifest<T> {
     }
 }
 extension ElementEditor where M == ElementEditManifest<T> {
+    /// Constructs the editor in edit mode.
+    /// - Parameters:
+    ///     - using: The container to source information from.
+    ///     - from: The value to edit.
+    ///     - postAction: An optional action to run after successfuly saving the data.
     public init(using: NSPersistentContainer, from: T, postAction: (() -> Void)? = nil) {
         self.init(
             manifest: .init(using: using, from: from),
@@ -114,6 +129,10 @@ extension ElementEditor where M == ElementEditManifest<T> {
             postAction: postAction
         )
     }
+    /// Constructs the editor in edit mode.
+    /// - Parameters:
+    ///     - editManifest: The ``ElementEditManifest`` to source information from.
+    ///     - postAction: An optional action to run after successfuly saving the data.
     public init(editManifest: ElementEditManifest<T>, postAction: (() -> Void)? = nil) {
         self.init(
             manifest: editManifest,

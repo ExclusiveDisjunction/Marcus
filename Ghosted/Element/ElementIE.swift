@@ -9,8 +9,7 @@ import SwiftUI;
 import CoreData
 import os
 
-
-/// A high level view that allows for switching between editing and inspecting
+/// A high level view that allows for switching between editing and inspecting an element..
 public struct ElementIE<T> : View where T: InspectableElement & EditableElement & NSManagedObject & TypeTitled {
     
     /// Constructs the view in add mode, using a function to create a default value.
@@ -38,7 +37,7 @@ public struct ElementIE<T> : View where T: InspectableElement & EditableElement 
     ///     - postAction: An optional closure to run after a successful save/dismissal is completed.
     ///
     ///  By default, this locks the user from switching mode to inspection.
-    ///  - Note: The view will be bound to the same ``NSPersistentContainer`` that the manifest was created with.
+    ///  - Note: The view will be bound to the same `NSPersistentContainer` that the manifest was created with.
     public init(
         adding: ElementAddManifest<T>,
         postAction: (() -> Void)? = nil
@@ -54,7 +53,7 @@ public struct ElementIE<T> : View where T: InspectableElement & EditableElement 
     ///     - editing: The target data to edit.
     ///     - postAction: An optional closure to run after a successful save/dismissal is completed.
     ///
-    /// Unlike ``ElementEditManifest``, this view cannot be constructed from a direct ``NSManagedObjectID`` (as the types might mismatch). If you must construct from a ``NSManagedObjectID``, use ``init(edit:postAction:)``
+    /// Unlike ``ElementEditManifest``, this view cannot be constructed from a direct `NSManagedObjectID` (as the types might mismatch). If you must construct from a `NSManagedObjectID`, use ``init(edit:postAction:)``
     ///
     /// - Warning: If the target data did not come from the passed container,  the view may do undefined behaviors and/or crashes.
     public init(
@@ -72,7 +71,7 @@ public struct ElementIE<T> : View where T: InspectableElement & EditableElement 
     ///     - edit: The pre-created manifest to source information from.
     ///     - postAction: An optional closure to run after a successful save/dismissal is completed.
     ///
-    ///  - Note: The view will be bound to the same ``NSPersistentContainer`` that the manifest was created with.
+    ///  - Note: The view will be bound to the same `NSPersistentContainer` that the manifest was created with.
     public init(
         edit: ElementEditManifest<T>,
         postAction: (() -> Void)? = nil
@@ -84,7 +83,7 @@ public struct ElementIE<T> : View where T: InspectableElement & EditableElement 
     }
     /// Constructs the view in inspect mode from pre-sourced information.
     /// - Parameters:
-    ///     - viewingFrom: The ``NSPersistentContainer`` the information is sourced from.
+    ///     - viewingFrom: The `NSPersistentContainer` the information is sourced from.
     ///     - viewing: The information to inspect.
     ///     - postAction: An optional closure to run after a successful save/dismissal is completed.
     ///
@@ -113,6 +112,7 @@ public struct ElementIE<T> : View where T: InspectableElement & EditableElement 
     private let postAction: (() -> Void)?;
     private let source: NSPersistentContainer;
     
+    /// Determining  if the editor is in edit mode (adding or editing)
     private var isEdit: Bool {
         switch self.state {
             case .add(_): true

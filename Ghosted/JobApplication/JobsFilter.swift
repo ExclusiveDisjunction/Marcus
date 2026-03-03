@@ -10,6 +10,7 @@ import CoreData
 import Combine
 import Observation
 
+/// A SwftUI `Section` that allows for the modification of a `Set<T>` through toggles.
 public struct FilterSubsection<C, T> : View
 where C: AnyObject,
       T: Hashable & Identifiable & Displayable & CaseIterable,
@@ -69,6 +70,10 @@ where C: AnyObject,
     }
 }
 
+/// A View-Model state that allows for querying via a search string.
+///
+/// This VM stores two values: ``ApplicationsSearchState/queryString`` and ``ApplicationsSearchState/uiQueryString``. The UI variant is designed to be bound directly to UI `searchable` instances. It is set up so that after 400 ms, the ``ApplicationsSearchState/queryString`` will be updated.
+/// The predicate produced will look for positions or companies containg the query string.
 @MainActor
 public class ApplicationsSearchState : ObservableObject, Hashable, Equatable {
     public init() {
@@ -89,13 +94,21 @@ public class ApplicationsSearchState : ObservableObject, Hashable, Equatable {
         cancel?.cancel()
     }
     
+    /// The current query string.
     @Published public var queryString: String;
+    /// The UI facing query string. This will debounce update to ``ApplicationsSearchState/queryString``.
     @Published public var uiQueryString: String;
+    /// A cancelation token that will be called when the class deinits.
     private var cancel: (any Cancellable)?;
     
+    /// The cached predicate.
     private var predicate: NSPredicate? = nil;
+    /// The last hash value to compare to determine if the predicate needs to be updated.
     private var lastHash: Int = 0;
     
+    /// Creates a predicate around the ``ApplicationsSearchState/queryString``.
+    ///
+    /// If the class has not changed between the last call to ``computePredicate()``, the internally cached predicate will be returned. Otherwise, a new predicate will be made, and cached.
     public func computePredicate() -> NSPredicate? {
         if lastHash == self.hashValue {
             return predicate;
@@ -120,15 +133,21 @@ public class ApplicationsSearchState : ObservableObject, Hashable, Equatable {
     }
 }
 
+/// A filter state for selecting date ranges.
 public enum DatesFilterRange : Int, Hashable, Equatable, Identifiable, CaseIterable {
+    /// Disables the filter, i.e. allows all dates.
     case anyDate
+    /// Accepts any date before a specified date.
     case before
+    /// Accepts any date after a specified date.
     case after
+    /// Accepts any date between two specified dates.
     case between
     
     public var id: Self { self }
 }
 
+/// A View-Model state that allows for filtering of job application instances.
 @MainActor
 @Observable
 public class ApplicationsFilterState : Hashable, Equatable {
@@ -140,16 +159,27 @@ public class ApplicationsFilterState : Hashable, Equatable {
         self.lastHash = 0;
     }
     
+    /// All allowed job application states.
     public var states: Set<JobApplicationState>;
+    /// All allowed job kinds.
     public var kinds: Set<JobKind>;
+    /// All allowed job location kinds.
     public var locations: Set<JobLocation>;
+    /// The current filter state range
     public var filterRange: DatesFilterRange = .anyDate;
+    /// The begin date (used for ``DatesFilterRange/before`` and ``DatesFilterRange/between``)
     public var before: Date = .now;
+    /// The end date (used for ``DatesFilterRange/after`` and ``DatesFilterRange/between``)
     public var after: Date = .now;
     
+    /// The cached predicate.
     @ObservationIgnored private var predicate: NSPredicate?;
+    /// The last hash value to compare to determine if the predicate needs to be updated.
     @ObservationIgnored private var lastHash: Int;
     
+    /// Creates a predicate around the ``ApplicationsFilterState`` values.
+    ///
+    /// If the class has not changed between the last call to ``preparePredicate()()``, the internally cached predicate will be returned. Otherwise, a new predicate will be made, and cached.
     public func preparePredicate() -> NSPredicate {
         if let predicate = self.predicate, self.hashValue == lastHash {
             return predicate;
@@ -190,10 +220,12 @@ public class ApplicationsFilterState : Hashable, Equatable {
     }
 
     
+    /// Resets the internal state to the default
     public func reset() {
         states = Set(JobApplicationState.allCases)
         kinds = Set(JobKind.allCases)
         locations = Set(JobLocation.allCases)
+        filterRange = .anyDate
     }
     
     public func hash(into hasher: inout Hasher) {
@@ -209,7 +241,9 @@ public class ApplicationsFilterState : Hashable, Equatable {
     }
 }
 
+/// A view that allows for the modification of a ``ApplicationsFilterState``.
 public struct JobsFilter : View {
+    /// Binds the view to a specific filter state.
     public init(_ state: ApplicationsFilterState) {
         self.state = state;
     }
@@ -302,6 +336,7 @@ public struct JobsFilter : View {
     }
 }
 
+@available(macOS 15, iOS 18, *)
 #Preview(traits: .sampleData) {
     @Previewable let state = ApplicationsFilterState()
     

@@ -9,9 +9,14 @@ import SwiftUI
 import CoreData
 import Charts
 
+/// Computed set of job applications status.
 public struct JobStats : Sendable {
     
+    /// For each ``JobApplicationState``, the amount of jobs with that amount.
+    ///
+    /// By the way this is computed, it will never contain a zero count.
     public let counts: [(JobApplicationState, Int)];
+    /// The total count of job applications.
     public let totalCount: Int;
 }
 
@@ -24,7 +29,9 @@ extension JobApplicationState : Plottable {
     }
 }
 
+/// Computes and visualizes a ``JobStats`` value based on a container.
 public struct JobStatsViewer : View {
+    /// Constructs the view around a `NSPersistentContainer`, defaulting to ``DataStack/currentContainer``.
     public init(container: NSPersistentContainer = DataStack.shared.currentContainer) {
         self.container = container;
     }
@@ -35,6 +42,7 @@ public struct JobStatsViewer : View {
     
     @Environment(\.dismiss) private var dismiss;
     
+    /// Determines the stats on a background context from the container.
     private nonisolated func load() async throws -> JobStats {
         let context = container.newBackgroundContext();
         
@@ -144,6 +152,7 @@ public struct JobStatsViewer : View {
     }
 }
 
+@available(macOS 15, iOS 18, *)
 #Preview(traits: .sampleData) {
     JobStatsViewer()
 }

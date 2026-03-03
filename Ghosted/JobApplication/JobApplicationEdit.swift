@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+/// A view that allows for the editing of a ``JobApplication``
 public struct JobApplicationEdit : View {
     public init(_ source: JobApplication) {
         self._source = .init(wrappedValue: source);
@@ -158,6 +159,7 @@ extension JobApplication : EditableElement {
     }
 }
 
+@available(macOS 15, iOS 18, *)
 #Preview(traits: .sampleData) {
     @Previewable @FetchRequest<JobApplication>(sortDescriptors: [])
     var apps: FetchedResults<JobApplication>;

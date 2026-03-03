@@ -8,16 +8,24 @@
 import SwiftUI
 import CoreData
 
+/// The state of an application, specifically, which stage of the job application process the job is in.
 public enum JobApplicationState : Int16, Equatable, Hashable, Codable, Sendable, CaseIterable, Identifiable {
+    /// The application has been submitted.
     case applied = 0
+    /// The application is being reviewed by the hiring team.
     case underReview = 1
+    /// The applicant is being interviewed, or had an interview, with the hiring team.
     case inInterview = 2
+    /// The applicant was rejected by the hiring team.
     case rejected = 3
+    /// The application was accepted!
     case accepted = 4
+    /// The application was ghosted.
     case ghosted = 5
     
     public var id: Self { self }
     
+    /// The display color to use to indicate the status of the application on the UI.
     public var color: Color {
         switch self {
             case .applied: Color.primary
@@ -47,9 +55,13 @@ extension JobApplicationState : Displayable {
     }
 }
 
+/// The location where the job will take place. This is either physical or virtual, or both.
 public enum JobLocation : Int16, Equatable, Hashable, Codable, Sendable, CaseIterable, Identifiable {
+    /// The applicant is expected to be at the worksite.
     case onSite = 0
+    /// The applicant is expected to be at the worksite on select workdays.
     case hybrid = 1
+    /// The applicant does not visit the worksite.
     case remote = 2
     
     public var id: Self { self }
@@ -64,10 +76,15 @@ extension JobLocation : Displayable {
     }
 }
 
+/// The role type of the job application. This is how many hours, or consistency of hours.
 public enum JobKind : Int16, Equatable, Hashable, Codable, Sendable, CaseIterable, Identifiable {
+    /// The applicant works a full work week (40 hours in USA)
     case fullTime = 0
+    /// The applicant works less than a full work week.
     case partTime = 1
+    /// The applicant is a seasonal hire.
     case seasonal = 2
+    /// The applicant is a contractor or freelanced to the company.
     case contractor = 3
     
     public var id: Self { self }
@@ -84,39 +101,48 @@ extension JobKind : Displayable {
 }
 
 public extension JobApplication {
+    /// The name of the position that was applied to.
     var position: String {
         get { self.internalPosition ?? String() }
         set { self.internalPosition = newValue }
     }
+    /// The company offering the position.
     var company: String {
         get { self.internalCompany ?? String() }
         set { self.internalCompany = newValue }
     }
+    /// The location of the worksite
     var location: String {
         get { self.internalLocation ?? String() }
         set { self.internalLocation = newValue }
     }
+    /// What date the application was submitted
     var appliedOn: Date {
         get { self.internalAppliedOn ?? .distantPast }
         set { self.internalAppliedOn = newValue }
     }
+    /// The status of the job application
     var state: JobApplicationState {
         get { JobApplicationState(rawValue: self.internalState) ?? .applied }
         set { self.internalState = newValue.rawValue }
     }
+    /// The kind of job the company is offering.
     var kind: JobKind {
         get { JobKind(rawValue: self.internalKind) ?? .fullTime }
         set { self.internalKind = newValue.rawValue }
     }
+    /// The kind of location expectations for the applicant.
     var locationKind: JobLocation {
         get { JobLocation(rawValue: self.internalLocationKind) ?? .onSite }
         set { self.internalLocationKind = newValue.rawValue }
     }
+    /// Any notes about the application or company.
     var notes: String {
         get { self.internalNotes ?? String() }
         set { self.internalNotes = newValue }
     }
     
+    /// Determines if the internal state of the application is valid.
     private func validateValues() throws(ValidationFailure) {
         var builder = ValidationFailureBuilder();
         if position.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {

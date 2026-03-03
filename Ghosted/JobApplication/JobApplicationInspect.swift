@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+/// A view that allows for the inspection of a ``JobApplication``
 public struct JobApplicationInspect : View {
     public init(_ source: JobApplication) {
         self.source = source;
@@ -135,6 +136,7 @@ extension JobApplication : TypeTitled {
     }
 }
 
+@available(macOS 15, iOS 18, *)
 #Preview(traits: .sampleData) {
     @Previewable @FetchRequest<JobApplication>(sortDescriptors: [])
     var apps: FetchedResults<JobApplication>;

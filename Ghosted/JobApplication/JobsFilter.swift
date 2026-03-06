@@ -120,7 +120,7 @@ public class ApplicationsFilterState : Hashable, Equatable {
     
     /// Creates a predicate around the ``ApplicationsFilterState`` values.
     ///
-    /// If the class has not changed between the last call to ``preparePredicate()()``, the internally cached predicate will be returned. Otherwise, a new predicate will be made, and cached.
+    /// If the class has not changed between the last call to ``preparePredicate()``, the internally cached predicate will be returned. Otherwise, a new predicate will be made, and cached.
     public func preparePredicate() -> NSPredicate {
         if let predicate = self.predicate, self.hashValue == lastHash {
             return predicate;

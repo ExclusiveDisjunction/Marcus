@@ -8,6 +8,7 @@
 import SwiftUI
 import CoreData
 import ExDisj
+import Combine
 
 /// The state of an application, specifically, which stage of the job application process the job is in.
 public enum JobApplicationState : Int16, Equatable, Hashable, Codable, Sendable, CaseIterable, Identifiable {
@@ -125,17 +126,26 @@ public extension JobApplication {
     /// The status of the job application
     var state: JobApplicationState {
         get { JobApplicationState(rawValue: self.internalState) ?? .applied }
-        set { self.internalState = newValue.rawValue }
+        set {
+            self.objectWillChange.send()
+            self.internalState = newValue.rawValue
+        }
     }
     /// The kind of job the company is offering.
     var kind: JobKind {
         get { JobKind(rawValue: self.internalKind) ?? .fullTime }
-        set { self.internalKind = newValue.rawValue }
+        set {
+            self.objectWillChange.send()
+            self.internalKind = newValue.rawValue
+        }
     }
     /// The kind of location expectations for the applicant.
     var locationKind: JobLocation {
         get { JobLocation(rawValue: self.internalLocationKind) ?? .onSite }
-        set { self.internalLocationKind = newValue.rawValue }
+        set {
+            self.objectWillChange.send()
+            self.internalLocationKind = newValue.rawValue
+        }
     }
     /// Any notes about the application or company.
     var notes: String {

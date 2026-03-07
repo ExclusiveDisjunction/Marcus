@@ -10,15 +10,11 @@ import ExDisj
 
 /// A view that allows for the editing of a ``JobApplication``
 public struct JobApplicationEdit : View {
-    public init(_ source: JobApplication) {
-        self._source = .init(wrappedValue: source);
-    }
+    @ObservedObject public var source: JobApplication;
     
     @State private var hasUrl: Bool = false;
     @State private var rawUrl: String = "";
     @State private var urlError = false;
-    
-    @ObservedObject private var source: JobApplication;
     
 #if os(macOS)
     private let minWidth: CGFloat = 80;
@@ -61,6 +57,7 @@ public struct JobApplicationEdit : View {
                         .frame(minWidth: minWidth, maxWidth: maxWidth, alignment: .trailing)
                     
                     EnumPicker(value: $source.state)
+                        .id(source.state)
                 }
                 
                 GridRow {
@@ -156,7 +153,7 @@ public struct JobApplicationEdit : View {
 extension JobApplication : EditableElement {
     @MainActor
     public func makeEditView() -> JobApplicationEdit {
-        JobApplicationEdit(self)
+        JobApplicationEdit(source: self)
     }
 }
 

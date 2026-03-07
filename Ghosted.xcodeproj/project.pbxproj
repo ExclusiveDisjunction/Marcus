@@ -38,7 +38,6 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
-				"Resources/Icon-Svg.svg",
 				Resources/Icon.icon,
 				"Resources/Icons/1024x1/Icon-Draft2-iOS-ClearDark-1024x1024@1x.png",
 				"Resources/Icons/1024x1/Icon-Draft2-iOS-ClearLight-1024x1024@1x.png",

@@ -24,6 +24,7 @@
               }
             }
           ],
+          "glass" : true,
           "image-name" : "Logo-Draft2.svg",
           "name" : "Logo-Draft2",
           "position" : {

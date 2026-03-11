@@ -57,7 +57,9 @@ public struct JobApplicationEdit : View {
                         .frame(minWidth: minWidth, maxWidth: maxWidth, alignment: .trailing)
                     
                     EnumPicker(value: $source.state)
-                        .id(source.state)
+                        .onChange(of: source.state) { _, _ in
+                            source.lastStatusUpdated = .now;
+                        }
                 }
                 
                 GridRow {

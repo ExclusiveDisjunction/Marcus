@@ -97,15 +97,6 @@ public struct JobStatsViewer : View {
                     .padding(.bottom, 25)
                 
                 Chart {
-                    /*
-                     SectorPlot(
-                     stats.counts,
-                     angle: .value("Count", \.1),
-                     angularInset: 2
-                     ).foregroundStyle(
-                     by: .value("State", \.0)
-                     )
-                     */
                     ForEach(stats.counts, id: \.0.rawValue) { (state, count) in
                         SectorMark(angle: .value("Count", count), angularInset: 2)
                             .foregroundStyle(by: .value("State", state))

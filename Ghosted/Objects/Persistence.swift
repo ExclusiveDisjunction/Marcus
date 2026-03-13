@@ -5,17 +5,9 @@
 //  Created by Hollan Sellars on 3/1/26.
 //
 
-@preconcurrency import CoreData
-import Combine
+import ExDisj
+import CoreData
 import SwiftUI
-
-/// A type that can be used to fill in dummy data for a `NSManagedObjectContext`.
-public protocol ContainerDataFiller {
-    /// Given the `context`, fill out the container's values.
-    /// - Parameters:
-    ///     - context: The `NSManagedObjectContext` to insert to.
-    func fill(context: NSManagedObjectContext) throws;
-}
 
 public struct DebugContainerFiller : ContainerDataFiller {
     public func fill(context: NSManagedObjectContext) throws {
@@ -39,114 +31,47 @@ public struct DebugContainerFiller : ContainerDataFiller {
     }
 }
 
-public class DataStack : ObservableObject, @unchecked Sendable {
-    public static let shared: DataStack = DataStack()
-    public static let containerName = "Ghosted";
-    
-    private var _persistentContainer: NSPersistentContainer? = nil;
-    private var _debugContainer: NSPersistentContainer? = nil;
-    
-    public var currentContainer: NSPersistentContainer {
-        #if DEBUG
-        self.debugContainer
-        #else
-        self.persistentContainer
-        #endif
+//Ghosted specific
+public let modelName: String = "Ghosted";
+
+extension StoreDescription {
+    public static func inMemory(automaticMigrations: Bool = true) -> InMemoryStoreDescription where Self == InMemoryStoreDescription {
+        return InMemoryStoreDescription(modelName: Ghosted.modelName, automaticLightweightMigrations: automaticMigrations)
     }
-    
-    public var persistentContainer: NSPersistentContainer {
-        get {
-            if let container = self._persistentContainer {
-                return container;
-            }
-            
-            let container = NSPersistentContainer(name: Self.containerName);
-            
-            container.loadPersistentStores { _, error in
-                if let error {
-                    fatalError("Unable to load persistent store due to error \(error)")
-                }
-                
-                container.viewContext.automaticallyMergesChangesFromParent = true
-                container.viewContext.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy;
-            }
-            
-            self._persistentContainer = container;
-            return container;
+    public static func standard(automaticMigrations: Bool = true, path: URL...) -> StandardStoreDescription where Self == StandardStoreDescription {
+        return StandardStoreDescription(modelUrl: path, modelName: Ghosted.modelName, automaticLightweightMigrations: automaticMigrations)
+    }
+    public static func standard(automaticMigrations: Bool = true) throws -> StandardStoreDescription {
+        guard let url = URL(
+            string: "\(Ghosted.modelName).sqlite",
+            relativeTo: try FileManager.default
+                .url(
+                    for: .libraryDirectory,
+                    in: .userDomainMask,
+                    appropriateFor: nil,
+                    create: true
+                )
+        ) else {
+            throw CocoaError(.fileNoSuchFile)
         }
-    }
-    
-    public var debugContainer: NSPersistentContainer {
-        get {
-            if let container = self._debugContainer {
-                return container;
-            }
-            
-            let container = NSPersistentContainer(name: Self.containerName);
-            
-            let desc = NSPersistentStoreDescription();
-            desc.url = URL(fileURLWithPath: "/dev/null");
-            desc.shouldAddStoreAsynchronously = false;
-            container.persistentStoreDescriptions = [desc]
-            
-            container.loadPersistentStores { desc, error in
-                if let error = error {
-                    fatalError("Failed to make in memory store: \(error)")
-                }
-                
-                container.viewContext.automaticallyMergesChangesFromParent = true
-                container.viewContext.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy;
-                
-                do {
-                    try DebugContainerFiller().fill(context: container.viewContext)
-                    try container.viewContext.save();
-                } catch let e {
-                    fatalError("Unable to fill the debug container: \(e)")
-                }
-            }
-            
-            _debugContainer = container;
-            return container
-        }
-    }
-    
-    /// Creates an empty, in memory persistent container on each call.
-    /// Every call to this variable results in a new, isolated container.
-    public var emptyDebugContainer : NSPersistentContainer {
-        get {
-            let container = NSPersistentContainer(name: Self.containerName);
-            
-            let desc = NSPersistentStoreDescription();
-            desc.url = URL(fileURLWithPath: "/dev/null");
-            desc.shouldAddStoreAsynchronously = false;
-            container.persistentStoreDescriptions = [desc]
-            
-            container.loadPersistentStores { desc, error in
-                if let error = error {
-                    fatalError("Failed to make in memory store: \(error)")
-                }
-                
-                container.viewContext.automaticallyMergesChangesFromParent = true
-                container.viewContext.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy;
-            }
-            
-            return container
-        }
-    }
-    
-    private init() {
         
+        return StandardStoreDescription(modelUrl: [url], modelName: Ghosted.modelName, automaticLightweightMigrations: automaticMigrations)
     }
 }
 
 public struct DebugSampleData: PreviewModifier {
-    public static func makeSharedContext() throws -> DataStack {
-        DataStack.shared
+    public static func makeSharedContext() async throws -> DataStack {
+        try await DataStack(
+            desc: .builder(
+                filler: DebugContainerFiller(),
+                backing: .inMemory()
+            )
+        )
     }
     
     public func body(content: Content, context: DataStack) -> some View {
         content
-            .environment(\.managedObjectContext, context.debugContainer.viewContext)
+            .environment(\.dataStack, context)
     }
 }
 

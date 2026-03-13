@@ -22,10 +22,22 @@ public class GhostedAppState {
 
 struct GhostedApp: App {
     init() {
+        self.state = nil;
         
+        let (stream, cont) = AsyncStream<String>.makeStream();
+        
+        self.asyncStream = stream;
+        self.asyncContinuation = cont;
+        
+        loadingTask = Task {
+            
+        }
     }
     
     @State var state: GhostedAppState?;
+    @State var asyncContinuation: AsyncStream<String>.Continuation;
+    @State var asyncStream: AsyncStream<String>;
+    @State var loadingTask: Task<Void, Never>;
 
     var body: some Scene {
         WindowGroup {
@@ -35,15 +47,7 @@ struct GhostedApp: App {
                     .environment(\.statusReviewer, state.reviewer)
             }
             else {
-                VStack {
-                    Image("IconSVG")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 128)
-                        .padding()
-                    
-                    ProgressView("Loading")
-                }
+                AppLoadingView(asyncStream: $asyncStream)
             }
             
         }.commands {

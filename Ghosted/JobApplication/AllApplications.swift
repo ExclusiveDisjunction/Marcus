@@ -21,6 +21,7 @@ public struct AllApplications : View {
     
     @AppStorage("showStatusColors") private var showStatusColors: Bool = true;
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass;
+    @Environment(\.dataStack) private var dataStack;
     
     @State private var showingFilter = false;
     @State private var showingStats = false;
@@ -87,7 +88,7 @@ public struct AllApplications : View {
             }
             .withWarning(warning)
             .withElementDeleting(manifest: delete)
-            .withElementIE(manifest: inspect, using: DataStack.shared.currentContainer) { app in
+            .withElementIE(manifest: inspect, using: dataStack) { app in
                 app.position = "";
                 app.company = "";
                 app.appliedOn = .now;
@@ -134,7 +135,7 @@ public struct AllApplications : View {
             }
             .navigationTitle("Ghosted")
             .sheet(isPresented: $showingStats) {
-                JobStatsViewer()
+                JobStatsViewer(container: dataStack)
             }
             .sheet(isPresented: $showingFilter, onDismiss: preparePredicate) {
                 JobsFilter(filterState)

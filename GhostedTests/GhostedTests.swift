@@ -6,19 +6,24 @@
 //
 
 import Testing
-import Ghosted
 import CoreData
+
+import ExDisj
+import Ghosted
 
 struct GhostedTests {
 
     @Test
     func loadDebugStore() async throws {
-        let container = DataStack.shared.debugContainer;
+        let container = try await DataStack.debugContainer();
         
-        let count = try await container.viewContext.perform {
-            let appCount = try container.viewContext.count(for: JobApplication.fetchRequest());
-            
-            return appCount;
+        let count = try await confirmation { complete in
+            try await container.viewContext.perform {
+                let appCount = try container.viewContext.count(for: JobApplication.fetchRequest());
+                
+                complete();
+                return appCount;
+            }
         }
         
         #expect(count != 0);

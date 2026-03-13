@@ -12,8 +12,7 @@ import CoreData
 @Observable
 public class GhostedAppState {
     public nonisolated init() async throws {
-        persistenceController = DataStack.shared.currentContainer;
-        reviewer = StatusReviewer(container: persistenceController);
+        fatalError();
     }
     
     let persistenceController: NSPersistentContainer;

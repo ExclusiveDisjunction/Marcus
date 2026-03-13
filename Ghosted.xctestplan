@@ -18,7 +18,7 @@
   },
   "testTargets" : [
     {
-      "parallelizable" : false,
+      "parallelizable" : true,
       "target" : {
         "containerPath" : "container:Ghosted.xcodeproj",
         "identifier" : "DD10E6CA2F549CDD0079483C",

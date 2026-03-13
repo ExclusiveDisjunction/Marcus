@@ -9,6 +9,7 @@ import Foundation
 import Testing
 import CoreData
 import os
+import ExDisj
 
 import Ghosted
 
@@ -41,8 +42,8 @@ struct StatusReviewFiller : ContainerDataFiller {
 
 @Suite("StatusReviewerTests")
 struct StatusReviewerTests : Sendable {
-    static func prepare() async throws -> NSPersistentContainer {
-        let container = DataStack.shared.emptyDebugContainer;
+    static func prepare() async throws -> DataStack {
+        let container = try await DataStack.emptyDebugContainer();
         
         let cx = container.viewContext;
         try await cx.perform {
@@ -65,7 +66,7 @@ struct StatusReviewerTests : Sendable {
         targets = try await reviewer.compute(log: log, daysToCheck: 10, relativeTo: .now, calendar: cal);
     }
     
-    let container: NSPersistentContainer;
+    let container: DataStack;
     let cx: NSManagedObjectContext;
     let reviewer: StatusReviewer;
     let targets: StatusReviewPresenter.ById;

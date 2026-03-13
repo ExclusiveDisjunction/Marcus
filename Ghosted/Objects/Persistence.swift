@@ -59,14 +59,38 @@ extension StoreDescription {
     }
 }
 
-public struct DebugSampleData: PreviewModifier {
-    public static func makeSharedContext() async throws -> DataStack {
+public extension DataStack {
+    static func standardContainer() async throws -> DataStack {
+        try await DataStack(
+            desc: .standard()
+        )
+    }
+    static func debugContainer() async throws -> DataStack {
         try await DataStack(
             desc: .builder(
                 filler: DebugContainerFiller(),
                 backing: .inMemory()
             )
         )
+    }
+    static func emptyDebugContainer() async throws -> DataStack {
+        try await DataStack(
+            desc: .inMemory()
+        )
+    }
+    
+    static func currentContainer() async throws -> DataStack {
+#if DEBUG
+        try await Self.debugContainer()
+#else
+        try await Self.standardContainer()
+#endif
+    }
+}
+
+public struct DebugSampleData: PreviewModifier {
+    public static func makeSharedContext() async throws -> DataStack {
+        try await DataStack.debugContainer()
     }
     
     public func body(content: Content, context: DataStack) -> some View {

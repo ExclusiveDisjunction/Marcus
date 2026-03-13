@@ -32,12 +32,12 @@ extension JobApplicationState : Plottable {
 
 /// Computes and visualizes a ``JobStats`` value based on a container.
 public struct JobStatsViewer : View {
-    /// Constructs the view around a `NSPersistentContainer`, defaulting to ``DataStack/currentContainer``.
-    public init(container: NSPersistentContainer = DataStack.shared.currentContainer) {
+    /// Constructs the view around a `DataStack`.
+    public init(container: DataStack) {
         self.container = container;
     }
     
-    private let container: NSPersistentContainer;
+    private let container: DataStack;
     @State private var stats: JobStats?;
     @State private var hadError = false;
     
@@ -143,5 +143,7 @@ public struct JobStatsViewer : View {
 
 @available(macOS 15, iOS 18, *)
 #Preview(traits: .sampleData) {
-    JobStatsViewer()
+    @Previewable @Environment(\.dataStack) var dataStack;
+    
+    JobStatsViewer(container: dataStack)
 }

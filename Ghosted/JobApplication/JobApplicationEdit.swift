@@ -164,5 +164,7 @@ extension JobApplication : EditableElement {
     @Previewable @FetchRequest<JobApplication>(sortDescriptors: [])
     var apps: FetchedResults<JobApplication>;
     
-    ElementEditor(using: DataStack.shared.debugContainer, from: apps.first!)
+    @Previewable @Environment(\.dataStack) var dataStack;
+    
+    ElementEditor(using: dataStack, from: apps.first!)
 }

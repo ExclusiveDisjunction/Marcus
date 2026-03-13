@@ -9,8 +9,7 @@ import SwiftUI
 import Foundation
 
 public struct AppLoadingView : View {
-    @Binding var asyncStream: AsyncStream<String>;
-    @State private var currentMessage: String = "Loading";
+    @Bindable var state: AppLoadingHandle;
     
     public var body: some View {
         VStack {
@@ -21,16 +20,12 @@ public struct AppLoadingView : View {
                 .padding()
             
             ProgressView {
-                Text(verbatim: currentMessage)
+                Text(verbatim: state.phase?.rawValue ?? "Loading")
             }
-        }.task {
-            for await message in asyncStream {
-                await MainActor.run {
-                    withAnimation {
-                        currentMessage = message;
-                    }
-                }
-            }
-        }
+        }.padding()
     }
+}
+
+#Preview {
+    AppLoadingView(state: .init())
 }

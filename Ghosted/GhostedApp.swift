@@ -7,48 +7,29 @@
 
 import SwiftUI
 import CoreData
+import ExDisj
 
-@MainActor
-@Observable
-public class GhostedAppState {
-    public nonisolated init() async throws {
-        fatalError();
-    }
-    
-    let persistenceController: NSPersistentContainer;
-    let reviewer: StatusReviewer;
-}
+
 
 struct GhostedApp: App {
     init() {
-        self.state = nil;
+        let state = AppLoadingHandle();
+        self.state = state;
+        self.loader = .init(handle: state);
         
-        let (stream, cont) = AsyncStream<String>.makeStream();
-        
-        self.asyncStream = stream;
-        self.asyncContinuation = cont;
-        
-        loadingTask = Task {
-            
+        loadingTask = Task { [loader] in
+            await loader.load();
         }
     }
     
-    @State var state: GhostedAppState?;
-    @State var asyncContinuation: AsyncStream<String>.Continuation;
-    @State var asyncStream: AsyncStream<String>;
+    let loader: AppLoader;
+    @State var state: AppLoadingHandle;
     @State var loadingTask: Task<Void, Never>;
 
     var body: some Scene {
         WindowGroup {
-            if let state = state {
-                ContentView()
-                    .environment(\.managedObjectContext, state.persistenceController.viewContext)
-                    .environment(\.statusReviewer, state.reviewer)
-            }
-            else {
-                AppLoadingView(asyncStream: $asyncStream)
-            }
-            
+            AppLoadingView(state: state)
+                .environment(\.appLoader, loader)
         }.commands {
             GeneralCommands()
         }

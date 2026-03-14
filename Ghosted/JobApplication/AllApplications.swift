@@ -9,15 +9,15 @@ import SwiftUI
 import CoreData
 import ExDisj
 
+
+
 /// A view that provides an overview of all job applications, with the ability to filter, search, and provide statistics.
 public struct AllApplications : View {
     
     @QuerySelection<JobApplication>(sortDescriptors: [SortDescriptor(\JobApplication.internalAppliedOn)])
     private var applications;
     
-    private let warning = SelectionWarningManifest();
-    private let inspect = InspectionManifest<JobApplication>();
-    private let delete = DeletingManifest<JobApplication>();
+    @State private var manifests: JobApplicationsManifests = .init();
     
     @AppStorage("showStatusColors") private var showStatusColors: Bool = true;
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass;
@@ -44,25 +44,28 @@ public struct AllApplications : View {
         _applications.configure(predicate: pred)
     }
     
+    @ViewBuilder
+    private func firstCol(app: JobApplication) -> some View {
+        if horizontalSizeClass == .compact {
+            HStack {
+                Text(verbatim: app.position)
+                Spacer()
+                DisplayableVisualizer(value: app.state)
+                    .foregroundStyle(
+                        showStatusColors ? app.state.color : Color.primary
+                    )
+            }.swipeActions(edge: .trailing) {
+                SingularContextMenu(app, inspect: manifests.inspect, remove: manifests.delete, asSlide: true)
+            }
+        }
+        else {
+            Text(verbatim: app.position)
+        }
+    }
+    
     public var body: some View {
         Table(context: applications) {
-            TableColumn("Position") { app in
-                if horizontalSizeClass == .compact {
-                    HStack {
-                        Text(verbatim: app.position)
-                        Spacer()
-                        DisplayableVisualizer(value: app.state)
-                            .foregroundStyle(
-                                showStatusColors ? app.state.color : Color.primary
-                            )
-                    }.swipeActions(edge: .trailing) {
-                        SingularContextMenu(app, inspect: inspect, remove: delete, asSlide: true)
-                    }
-                }
-                else {
-                    Text(verbatim: app.position)
-                }
-            }
+            TableColumn("Position", content: firstCol)
                 .width(min: 100, ideal: 150)
             TableColumn("Company", value: \.company)
             TableColumn("Applied On") { app in
@@ -71,7 +74,7 @@ public struct AllApplications : View {
             TableColumn("Status") { app in
                 DisplayableVisualizer(value: app.state)
                     .foregroundStyle(
-                        showStatusColors ? app.state.color : Color.primary
+                        showStatusColors && !applications.contains(app.id) ? app.state.color : Color.primary
                     )
             }
             TableColumn("Location", value: \.location)
@@ -81,14 +84,14 @@ public struct AllApplications : View {
             .contextMenu(forSelectionType: JobApplication.ID.self) { selection in
                 SelectionContextMenu(
                     context: FrozenSelectionContext(data: applications.data, selection: selection),
-                    inspect: inspect,
-                    delete: delete,
-                    warning: warning
+                    inspect: manifests.inspect,
+                    delete: manifests.delete,
+                    warning: manifests.warning
                 )
             }
-            .withWarning(warning)
-            .withElementDeleting(manifest: delete)
-            .withElementIE(manifest: inspect, using: dataStack) { app in
+            .withWarning(manifests.warning)
+            .withElementDeleting(manifest: manifests.delete)
+            .withElementIE(manifest: manifests.inspect, using: dataStack) { app in
                 app.position = "";
                 app.company = "";
                 app.appliedOn = .now;
@@ -122,10 +125,10 @@ public struct AllApplications : View {
                     }
                 }
                 
-                ElementAddButton(inspect: inspect, placement: .primaryAction)
-                ElementInspectButton(context: applications, inspect: inspect, warning: warning, placement: .primaryAction)
-                ElementEditButton(context: applications, inspect: inspect, warning: warning, placement: .primaryAction)
-                ElementDeleteButton(context: applications, delete: delete, warning: warning, placement: .primaryAction)
+                ElementAddButton(inspect: manifests.inspect, placement: .primaryAction)
+                ElementInspectButton(context: applications, inspect: manifests.inspect, warning: manifests.warning, placement: .primaryAction)
+                ElementEditButton(context: applications, inspect: manifests.inspect, warning: manifests.warning, placement: .primaryAction)
+                ElementDeleteButton(context: applications, delete: manifests.delete, warning: manifests.warning, placement: .primaryAction)
                 
                 #if os(iOS)
                 ToolbarItem(placement: .automatic) {
@@ -145,6 +148,7 @@ public struct AllApplications : View {
                 print("Query string updated, changing predicates")
                 preparePredicate()
             }
+            .focusedValue(\.jobApplicationManifests, manifests)
     }
 }
 

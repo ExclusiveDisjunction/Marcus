@@ -1,0 +1,115 @@
+//
+//  GeneralCommands.swift
+//  Ghosted
+//
+//  Created by Hollan Sellars on 3/1/26.
+//
+
+import SwiftUI
+import ExDisj
+
+public enum StatusReviewPeriods : Int, Identifiable, Hashable, Equatable, Sendable {
+    case week = 7
+    case twoWeeks = 14
+    case month = 31
+    case twoMonths = 62
+    
+    public var id: Self { self }
+}
+
+public struct GeneralCommands : Commands {
+    
+    @AppStorage("showStatusColors") private var showStatusColors: Bool = true;
+    @AppStorage("remindAppStatus") private var remindAppStatus: Bool = true;
+    @AppStorage("statusReviewPeriod") private var statusReviewPeriod: StatusReviewPeriods = .twoWeeks;
+    @FocusedValue(\.jobApplicationManifests) private var jobAppManifests;
+    
+    @Environment(\.openWindow) private var openWindow;
+    
+    public var body: some Commands {
+        CommandGroup(after: .undoRedo) {
+            Button {
+                
+            } label: {
+                Label("Edit Selected", systemImage: "pencil")
+            }.keyboardShortcut("E", modifiers: .command)
+            
+            Button {
+                
+            } label: {
+                Label("Inspect Selected", systemImage: "info.circle")
+            }.keyboardShortcut("I", modifiers: .command)
+            
+            Button {
+                
+            } label: {
+                Label("Delete Selected", systemImage: "trash")
+                    .foregroundStyle(.red)
+            }.keyboardShortcut(.delete, modifiers: .command)
+                .foregroundStyle(.red)
+        }
+        
+        CommandMenu("Jobs") {
+            Button {
+                jobAppManifests?.inspect.openAdding()
+            } label: {
+                Label("New Application", systemImage: "plus")
+            }.keyboardShortcut("N", modifiers: [.command, .shift])
+                .disabled(jobAppManifests == nil)
+            
+            Divider()
+            
+            Section("Reminders") {
+                Toggle(isOn: $remindAppStatus) {
+                    Text("Enable Follow-Up Reminders")
+                }
+                
+                Button {
+                    
+                } label: {
+                    Text("Check Follow-Ups Now")
+                }.keyboardShortcut("F", modifiers: [.command])
+                
+                Picker("Default Follow-Up Period", selection: $statusReviewPeriod) {
+                    Text("After One Week")
+                        .tag(StatusReviewPeriods.week)
+                    
+                    Text("After Two Weeks")
+                        .tag(StatusReviewPeriods.twoWeeks)
+                    
+                    Text("After One Month")
+                        .tag(StatusReviewPeriods.month)
+                    
+                    Text("After Two Months")
+                        .tag(StatusReviewPeriods.twoMonths)
+                }
+                
+                Menu {
+                    Button("One Week from Today") {
+                        
+                    }.keyboardShortcut("1", modifiers: [.command, .option, .shift])
+                    
+                    Button("Two Weeks from Today") {
+                        
+                    }.keyboardShortcut("2", modifiers: [.command, .option, .shift])
+                    
+                    Button("One Month from Today") {
+                        
+                    }.keyboardShortcut("4", modifiers: [.command, .option, .shift])
+                    
+                    Button("Two Months from Today") {
+                        
+                    }.keyboardShortcut("8", modifiers: [.command, .option, .shift])
+                } label: {
+                    Text("Check Follow-Ups For...")
+                }
+            }
+        }
+        
+        CommandGroup(after: .textFormatting) {
+            Toggle(isOn: $showStatusColors) {
+                Label("Show Colors on Job Status", systemImage: "eyedropper.full")
+            }
+        }
+    }
+}

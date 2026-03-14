@@ -9,8 +9,6 @@ import SwiftUI
 import CoreData
 import ExDisj
 
-
-
 struct GhostedApp: App {
     init() {
         let state = AppLoadingHandle();
@@ -24,12 +22,13 @@ struct GhostedApp: App {
     
     let loader: AppLoader;
     @StateObject var state: AppLoadingHandle;
-    @State var loadingTask: Task<Void, Never>;
+    let loadingTask: Task<Void, Never>;
 
     var body: some Scene {
         WindowGroup {
-            AppLoadingView(state: state)
-                .environment(\.appLoader, loader)
+            LoadingGate(state: state) {
+                ContentView()
+            }.environment(\.appLoader, loader)
         }.commands {
             GeneralCommands()
         }

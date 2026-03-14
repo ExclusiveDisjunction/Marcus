@@ -93,26 +93,37 @@ public actor AppLoader {
     
     public func load(beforeComplete: ((DataStack) async throws -> Void)? = nil) async {
         log.info("Begining app loading process.")
-        await handle.reset();
+        await MainActor.run {
+            handle.reset();
+        }
         
         log.info("Loading data stack");
-        await handle.updatePhase(to: .loadingData);
+        await MainActor.run {
+            handle.updatePhase(to: .loadingData);
+        }
         let stack: DataStack;
         do {
             stack = try await DataStack.currentContainer();
         }
         catch let e {
             log.error("Unable to load stack due to error \(e)");
-            await handle.withError(err: e);
+            await MainActor.run {
+                handle.withError(err: e);
+            }
             return;
         }
         
         log.info("Loading status reviewer");
-        await handle.updatePhase(to: .reviewingApps);
+        await MainActor.run {
+            handle.updatePhase(to: .reviewingApps);
+        }
+        
         let reviewer = StatusReviewer(cx: stack.newBackgroundContext());
         
         log.info("Completed loading main components.");
-        await handle.updatePhase(to: .wrappingUp);
+        await MainActor.run {
+            handle.updatePhase(to: .wrappingUp);
+        }
         
         if let beforeComplete = beforeComplete {
             do {
@@ -126,7 +137,9 @@ public actor AppLoader {
         
         log.info("Completed app loading");
         let completed = LoadedAppState(stack: stack, reviewer: reviewer);
-        await handle.withLoaded(loaded: completed);
+        await MainActor.run {
+            handle.withLoaded(loaded: completed);
+        }
     }
     public func reset() async throws {
         guard case .loaded(let loaded) = await handle.state else {
@@ -158,43 +171,4 @@ public extension EnvironmentValues {
     }
 }
 
-public struct LoadingGate<Load, Err, Content> : View where Load: View, Err: View, Content: View {
-    public init(state: AppLoadingHandle, @ViewBuilder load: @escaping () -> Load, @ViewBuilder err: @escaping (AppLoadError) -> Err, @ViewBuilder content: @escaping () -> Content) {
-        self._state = .init(wrappedValue: state);
-        self.load = load;
-        self.err = err;
-        self.content = content;
-    }
-    
-    @ObservedObject private var state: AppLoadingHandle;
-    private let load: () -> Load;
-    private let err: (AppLoadError) -> Err;
-    private let content: () -> Content;
-    
-    @ViewBuilder
-    private var internalContent: some View {
-        switch state.state {
-            case .err(let error):
-                err(error)
-            case .loaded(let loaded):
-                content()
-                    .withLoadedApp(loaded)
-            case .loading:
-                load()
-        }
-    }
-    public var body: some View {
-        internalContent
-            .id(state.state.id)
-    }
-}
-extension LoadingGate where Load == AppLoadingView, Err == AppLoadingErrorView {
-    public init(state: AppLoadingHandle, @ViewBuilder content: @escaping () -> Content) {
-        self.init(
-            state: state,
-            load: { AppLoadingView(state: state) },
-            err: AppLoadingErrorView.init,
-            content: content
-        )
-    }
-}
+

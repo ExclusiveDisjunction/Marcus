@@ -38,10 +38,10 @@ extension StoreDescription {
     public static func inMemory(automaticMigrations: Bool = true) -> InMemoryStoreDescription where Self == InMemoryStoreDescription {
         return InMemoryStoreDescription(modelName: Ghosted.modelName, automaticLightweightMigrations: automaticMigrations)
     }
-    public static func standard(automaticMigrations: Bool = true, path: URL...) -> StandardStoreDescription where Self == StandardStoreDescription {
-        return StandardStoreDescription(modelUrl: path, modelName: Ghosted.modelName, automaticLightweightMigrations: automaticMigrations)
+    public static func standard(automaticMigrations: Bool = true, paths: [URL]) -> StandardStoreDescription where Self == StandardStoreDescription {
+        return StandardStoreDescription(modelUrl: paths, modelName: Ghosted.modelName, automaticLightweightMigrations: automaticMigrations)
     }
-    public static func standard(automaticMigrations: Bool = true) throws -> StandardStoreDescription {
+    public static func standard(automaticMigrations: Bool = true) throws -> StandardStoreDescription where Self == StandardStoreDescription {
         guard let url = URL(
             string: "\(Ghosted.modelName).sqlite",
             relativeTo: try FileManager.default
@@ -54,6 +54,8 @@ extension StoreDescription {
         ) else {
             throw CocoaError(.fileNoSuchFile)
         }
+        
+        print("Returning a store description pointing to \(url)")
         
         return StandardStoreDescription(modelUrl: [url], modelName: Ghosted.modelName, automaticLightweightMigrations: automaticMigrations)
     }
@@ -81,9 +83,11 @@ public extension DataStack {
     
     static func currentContainer() async throws -> DataStack {
 #if DEBUG
-        try await Self.debugContainer()
+        print("The current container is debug")
+        return try await Self.debugContainer()
 #else
-        try await Self.standardContainer()
+        print("The current container is release")
+        return try await Self.standardContainer()
 #endif
     }
 }

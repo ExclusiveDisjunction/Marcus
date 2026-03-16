@@ -61,7 +61,7 @@ struct StatusReviewerTests : Sendable {
         cal = Calendar.current;
         log = Logger(subsystem: "com.exdisj.Ghosted", category: "Unit Testing")
         
-        reviewer = StatusReviewer(cx: container.newBackgroundContext());
+        reviewer = StatusReviewer(container: container, logger: log);
         
         targets = try await reviewer.compute(log: log, daysToCheck: 10, relativeTo: .now, calendar: cal);
     }
@@ -69,7 +69,7 @@ struct StatusReviewerTests : Sendable {
     let container: DataStack;
     let cx: NSManagedObjectContext;
     let reviewer: StatusReviewer;
-    let targets: StatusReviewPresenter.ById;
+    let targets: StatusReviewer.ById;
     let cal: Calendar;
     let log: Logger;
     
@@ -188,7 +188,7 @@ struct StatusReviewerTests : Sendable {
     
     @Test("IDs-Prepare")
     func idPrepare() async throws {
-        let bySection = StatusReviewPresenter.prepare(from: targets);
+        let bySection = StatusReviewerSheet.prepare(from: targets);
         
         let totalCount = await cx.perform {
             var totalCount = 0;
@@ -209,7 +209,7 @@ struct StatusReviewerTests : Sendable {
         
         // Now we have to demangle it back into targets.
         
-        let demangled = StatusReviewPresenter.demangle(bySection: bySection);
+        let demangled = StatusReviewerSheet.demangle(bySection: bySection);
         await MainActor.run {
             #expect(demangled == targets);
         }

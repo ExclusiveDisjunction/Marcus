@@ -22,10 +22,19 @@ public struct GeneralCommands : Commands {
     @AppStorage("showStatusColors") private var showStatusColors: Bool = true;
     @AppStorage("remindAppStatus") private var remindAppStatus: Bool = true;
     @AppStorage("statusReviewPeriod") private var statusReviewPeriod: StatusReviewPeriods = .twoWeeks;
+    
     @FocusedValue(\.jobApplicationManifests) private var jobAppManifests;
-    @FocusedValue(\.statusReviewViewModel) private var statusReview;
+    @FocusedValue(\.statusReviewer) private var statusReview;
     
     @Environment(\.openWindow) private var openWindow;
+    @Environment(\.calendar) private var calendar;
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion;
+    
+    private func performFollowUps(forDays: Int) {
+        Task {
+            await statusReview?.compute(forDays: forDays, calendar: calendar, animated: !reduceMotion);
+        }
+    }
     
     public var body: some Commands {
         CommandGroup(after: .undoRedo) {
@@ -66,7 +75,7 @@ public struct GeneralCommands : Commands {
                 }
                 
                 Button {
-                    
+                    performFollowUps(forDays: statusReviewPeriod.rawValue)
                 } label: {
                     Text("Check Follow-Ups Now")
                 }.keyboardShortcut("F", modifiers: [.command])
@@ -88,19 +97,19 @@ public struct GeneralCommands : Commands {
                 
                 Menu {
                     Button("One Week from Today") {
-                        
+                        performFollowUps(forDays: 7)
                     }.keyboardShortcut("1", modifiers: [.command, .option, .shift])
                     
                     Button("Two Weeks from Today") {
-                        
+                        performFollowUps(forDays: 14)
                     }.keyboardShortcut("2", modifiers: [.command, .option, .shift])
                     
                     Button("One Month from Today") {
-                        
+                        performFollowUps(forDays: 31)
                     }.keyboardShortcut("4", modifiers: [.command, .option, .shift])
                     
                     Button("Two Months from Today") {
-                        
+                        performFollowUps(forDays: 62)
                     }.keyboardShortcut("8", modifiers: [.command, .option, .shift])
                 } label: {
                     Text("Check Follow-Ups For...")

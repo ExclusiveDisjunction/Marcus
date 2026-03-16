@@ -26,12 +26,14 @@ public struct AppLoadError : Error {
 public struct LoadedAppState : Sendable {
     let stack: DataStack;
     let reviewer: StatusReviewer;
+    let logger: Logger;
 }
 public extension View {
     func withLoadedApp(_ state: LoadedAppState) -> some View {
         self
             .environment(\.dataStack, state.stack)
             .environment(\.statusReviewer, state.reviewer)
+            .environment(\.logger, state.logger)
     }
 }
 
@@ -112,7 +114,8 @@ public actor AppLoader {
         log.info("Loading status reviewer");
         await handle.updatePhase(to: .reviewingApps, animated: animated);
         
-        let reviewer = StatusReviewer(cx: stack.newBackgroundContext());
+        let appLogger = Logger(subsystem: "com.exdisj.Ghosted", category: "App")
+        let reviewer = StatusReviewer(container: stack, logger: appLogger);
         
         log.info("Completed loading main components.");
         await handle.updatePhase(to: .wrappingUp, animated: animated);
@@ -128,8 +131,8 @@ public actor AppLoader {
         }
         
         log.info("Completed app loading");
-        let completed = LoadedAppState(stack: stack, reviewer: reviewer);
-        try? await Task.sleep(for: .seconds(0.5))
+        let completed = LoadedAppState(stack: stack, reviewer: reviewer, logger: appLogger);
+        try? await Task.sleep(for: .seconds(0.5)) //Reduces screen flickering
         await handle.withLoaded(loaded: completed, animated: animated);
     }
     public func reset() async throws {
@@ -150,16 +153,8 @@ public actor AppLoader {
     }
 }
 
-fileprivate struct AppLoaderKey : EnvironmentKey {
-    static var defaultValue: AppLoader? {
-        nil
-    }
-}
 public extension EnvironmentValues {
-    var appLoader: AppLoader? {
-        get { self[AppLoaderKey.self] }
-        set { self[AppLoaderKey.self] = newValue }
-    }
+    @Entry var appLoader: AppLoader? = nil;
 }
 
 

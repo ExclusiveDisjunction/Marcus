@@ -8,6 +8,11 @@
 import SwiftUI
 import CoreData
 import ExDisj
+import os
+
+public extension EnvironmentValues {
+    @Entry var logger: Logger? = nil;
+}
 
 struct GhostedApp: App {
     init() {
@@ -28,10 +33,9 @@ struct GhostedApp: App {
         WindowGroup {
             LoadingGate(state: state) {
                 ContentView()
-            }.environment(\.appLoader, loader)
-        }.commands {
-            GeneralCommands()
-        }
+            }
+        }.commands(content: GeneralCommands.init)
+            .environment(\.appLoader, loader)
     }
 }
 

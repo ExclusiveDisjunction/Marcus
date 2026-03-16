@@ -16,18 +16,48 @@ import ExDisj
 @Observable
 public final class StatusReviewer : Sendable {
     /// Constructs the status reviewer from a container, creating a background context from it.
-    public init(container: DataStack) {
+    public init(container: DataStack, logger: Logger?) {
         self.cx = container.newBackgroundContext();
+        self.log = logger;
     }
     /// Constructs the status reviewer from `NSManagedObjectContext` instances.
     /// - Parameters:
     ///     - cx: The background thread model context, used to process and update information off the main thread.
-    public init(cx: NSManagedObjectContext) {
+    public init(cx: NSManagedObjectContext, logger: Logger?) {
         self.cx = cx;
+        self.log = logger;
     }
     
+    /// A structure to name extracted resources from an ``ApplicationStatusSnapshot``.
+    private struct UpdateRecord : Sendable, Identifiable {
+        /// The object's ID
+        let id: NSManagedObjectID;
+        /// When true, only the last updated date should be modified.
+        let markAsResolved: Bool;
+        /// If  `markAsResolved` is `false`, the state of the ``JobApplication`` should be set to this value.
+        let newStatus: JobApplicationState;
+    }
+    private enum State {
+        case idle
+        case loading
+        case loadError
+        case saveError
+        case withResults(StatusReviewer.ById)
+    }
+    
+    public typealias ById = [NSManagedObjectID : ApplicationStatusSnapshot];
+
     /// The context to peform computations with.
     @ObservationIgnored private let cx: NSManagedObjectContext;
+    @ObservationIgnored public let log: Logger?;
+    @MainActor
+    public private(set) var isLoading = false;
+    @MainActor
+    public private(set) var computedResults: StatusReviewer.ById?;
+    @MainActor
+    public var hadSaveError = false;
+    @MainActor
+    public var hadLoadError = false;
     
     /// A set of ``JobApplicationState`` values, represented by their raw value, that the ``StatusReviewer``  should flag for updating.
     public static let interestingApplicationStates = Set<JobApplicationState.RawValue>(
@@ -51,7 +81,7 @@ public final class StatusReviewer : Sendable {
     ///
     /// The purpose of this method is to determine all outdated ``JobApplication``s. 'Outdated', in this context, refers to the state being applied, in interview, or under review, and updated at least `daysToCheck` days ago.
     /// If the application has no last updated date, it will fetch it and use ``JobApplication/appliedOn`` as the source of truth.
-    public nonisolated func compute(log: Logger, daysToCheck: Int, relativeTo: Date, calendar: Calendar) async throws -> [NSManagedObjectID : ApplicationStatusSnapshot] {
+    public nonisolated func compute(log: Logger?, daysToCheck: Int, relativeTo: Date, calendar: Calendar) async throws -> StatusReviewer.ById {
         
         let toUpdate: [StaticApplicationStatusSnapshot] = try await cx.perform { [cx] in
             let req = JobApplication.fetchRequest();
@@ -66,7 +96,7 @@ public final class StatusReviewer : Sendable {
                 
                 let lastUpdated = calendar.startOfDay(for: rawLastUpdated)
                 guard let daysBetween = calendar.dateComponents([.day], from: lastUpdated, to: today).day else {
-                    log.warning("Could not determine days between today and last updated for application \(app.position)")
+                    log?.warning("Could not determine days between today and last updated for application \(app.position)")
                     continue;
                 }
                 
@@ -97,16 +127,6 @@ public final class StatusReviewer : Sendable {
         }.value;
     }
     
-    /// A structure to name extracted resources from an ``ApplicationStatusSnapshot``.
-    private struct UpdateRecord : Sendable, Identifiable {
-        /// The object's ID
-        let id: NSManagedObjectID;
-        /// When true, only the last updated date should be modified.
-        let markAsResolved: Bool;
-        /// If  `markAsResolved` is `false`, the state of the ``JobApplication`` should be set to this value.
-        let newStatus: JobApplicationState;
-    }
-    
     /// Updates job applications based on values from ``ApplicationStatusSnapshot``.
     /// - Parameters:
     ///     - results: The modified statuses to present to update from.
@@ -116,7 +136,7 @@ public final class StatusReviewer : Sendable {
     ///
     /// Within each ``ApplicationStatusSnapshot``, this method will determine records to be skipped. If the user did mark a snapshot as resolved (``ApplicationStatusSnapshot/updatedFlag``), nor change the state (``ApplicationStatusSnapshot/updateStateTo``),
     /// the record will be skipped. If the user changed the status, both the last updated date & application state will be changed. Otherwise, only the last updated date will change. After making all changes, the internal context will save.
-    public nonisolated func completeUpdate(results: [NSManagedObjectID : ApplicationStatusSnapshot], calendar: Calendar) async throws {
+    public nonisolated func completeUpdate(results: StatusReviewer.ById, calendar: Calendar) async throws {
         var keys = Set<NSManagedObjectID>();
         var processedResults = [UpdateRecord]();
         for (id, snapshot) in results {
@@ -157,125 +177,128 @@ public final class StatusReviewer : Sendable {
         
         try cx.save();
     }
-}
-
-@MainActor
-@Observable
-public final class StatusReviewViewModel : Sendable {
-    /// Determines which sheets are shown to the user.
-    public enum SheetMask {
-        case onlyResults
-        case allValues
-    }
     
-    public enum State {
-        case idle
-        case loading
-        case hadError
-        case withResults([NSManagedObjectID : ApplicationStatusSnapshot])
-    }
-    
-    public init(using: StatusReviewer, log: Logger) {
-        self.reviewer = using;
-        self.log = log;
-    }
-    
-    public func updateState(to: State, animated: Bool) {
+    @MainActor
+    private func updateState(to: State, animated: Bool) {
         optionalWithAnimation(isOn: animated) {
-            self.state = to
-        }
-    }
-    
-    @discardableResult
-    public func compute(forDays: Int, relativeTo: Date = .now, calendar: Calendar, withLoadingSheet: Bool, animated: Bool) async -> Bool {
-        updateState(to: .loading, animated: animated)
-        if withLoadingSheet {
-            self.sheetMask = .allValues;
-        }
-        
-        do {
-            let result = try await reviewer.compute(log: log, daysToCheck: forDays, relativeTo: relativeTo, calendar: calendar);
-            
-            updateState(to: .withResults(result), animated: animated)
-            return true;
-        }
-        catch let e {
-            log.error("Encountered error while reviewing status: \(e.localizedDescription)")
-            updateState(to: .hadError, animated: animated)
-            return false;
-        }
-        
-    }
-    @discardableResult
-    public func update(newData: [NSManagedObjectID : ApplicationStatusSnapshot], calendar: Calendar, animated: Bool) async -> Bool {
-        do {
-            try await self.reviewer.completeUpdate(results: newData, calendar: calendar);
-            showingSheet = false;
-            
-            return true;
-        }
-        catch let e {
-            log.error("Unable to save due to error \(e.localizedDescription)");
-            self.hadSaveError = true;
-            return false;
-        }
-    }
-    
-    public let log: Logger;
-    public let reviewer: StatusReviewer;
-    public private(set) var sheetMask: SheetMask = .onlyResults;
-    public private(set) var state: State = .idle;
-    public var hadSaveError = false;
-    
-    public var showingSheet: Bool {
-        get {
-            switch self.state {
-                case .withResults(_): return true
-                case .hadError: fallthrough
-                case .loading:
-                    guard self.sheetMask == .allValues else {
-                        self.state = .idle;
-                        return false;
-                    }
+            switch to {
+                case .idle:
+                    isLoading = false
+                    computedResults = nil;
+                    hadSaveError = false;
+                    hadLoadError = false;
                     
-                    return true;
-                case .idle: return false
+                case .loading:
+                    isLoading = true;
+                    computedResults = nil;
+                    hadSaveError = false;
+                    hadLoadError = false;
+                    
+                case .loadError:
+                    isLoading = false;
+                    computedResults = nil;
+                    hadSaveError = false;
+                    hadLoadError = true;
+                    
+                case .saveError:
+                    isLoading = false;
+                    computedResults = nil;
+                    hadSaveError = true;
+                    hadLoadError = false;
+                    
+                case .withResults(let results):
+                    isLoading = false;
+                    computedResults = results;
+                    hadSaveError = false;
+                    hadLoadError = false;
             }
         }
+    }
+    
+    @discardableResult
+    public nonisolated func compute(forDays: Int, relativeTo: Date = .now, calendar: Calendar, animated: Bool) async -> Bool {
+        log?.info("Asked to determine job applications for the last \(forDays) day(s)")
+        await updateState(to: .loading, animated: animated)
+        
+        do {
+            let result = try await self.compute(log: log, daysToCheck: forDays, relativeTo: relativeTo, calendar: calendar);
+            log?.info("Completed computation, found \(result.count) result(s)")
+            
+            await updateState(to: .withResults(result), animated: animated)
+            return true;
+        }
+        catch let e {
+            log?.error("Encountered error while reviewing status: \(e.localizedDescription)")
+            await updateState(to: .loadError, animated: animated)
+            return false;
+        }
+        
+    }
+    @discardableResult
+    public nonisolated func update(newData: StatusReviewer.ById, calendar: Calendar, animated: Bool) async -> Bool {
+        log?.info("Asked to update \(newData.count) job applications")
+        do {
+            try await self.completeUpdate(results: newData, calendar: calendar);
+            await self.updateState(to: .idle, animated: animated)
+            
+            return true;
+        }
+        catch let e {
+            log?.error("Unable to save due to error \(e.localizedDescription)");
+            await self.updateState(to: .saveError, animated: animated)
+            
+            return false;
+        }
+    }
+    
+    @MainActor
+    public var showingSheet: Bool {
+        get {
+            self.computedResults != nil
+        }
         set {
-            self.state = .idle;
-            self.sheetMask = .onlyResults;
+            self.computedResults = newValue ? [:] : nil;
         }
     }
 }
 
-private struct WithStatusReviewerVM : ViewModifier {
-    @Bindable var vm: StatusReviewViewModel;
+fileprivate struct WithStatusReviewer : ViewModifier {
+    @Bindable var vm: StatusReviewer;
     
     func body(content: Content) -> some View {
         content
             .sheet(isPresented: $vm.showingSheet) {
-                StatusReviewSheet(vm: vm)
+                StatusReviewerSheet(vm: vm, given: vm.computedResults ?? [:])
             }
-            .alert("Unable to Save", isPresented: $vm.hadSaveError) {
+            .alert("Unable to Load", isPresented: $vm.hadLoadError) {
                 OkButton()
             } message: {
-                Text("The job applications could not be updated. Please try again.")
+                Text("Ghosted was not able to load the follow-up reminders")
+            }
+            .alert("Unable to Save Changes", isPresented: $vm.hadSaveError) {
+                OkButton()
+            } message: {
+                Text("Ghosted was not able to save your changes. Please try again later.")
             }
     }
 }
 
 public extension View {
-    func withStatusReviewViewModel(_ vm: StatusReviewViewModel) -> some View {
-        self.modifier(WithStatusReviewerVM(vm: vm))
+    @ViewBuilder
+    func withStatusReviewer(_ vm: StatusReviewer?) -> some View {
+        if let vm = vm {
+            self.modifier(WithStatusReviewer(vm: vm))
+        }
+        else {
+            self
+        }
     }
 }
 
 public extension EnvironmentValues {
     @Entry var statusReviewer: StatusReviewer? = nil;
-    @Entry var statusReviewViewModel: StatusReviewViewModel? = nil;
 }
 
 public extension FocusedValues {
-    @Entry var statusReviewViewModel: StatusReviewViewModel? = nil;
+    @Entry var statusReviewer: StatusReviewer? = nil;
 }

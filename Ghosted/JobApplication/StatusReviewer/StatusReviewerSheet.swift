@@ -9,17 +9,23 @@ import SwiftUI
 import CoreData
 import ExDisj
 
-public struct StatusReviewPresenter : View {
-    public let given: [NSManagedObjectID : ApplicationStatusSnapshot];
+public struct StatusReviewerSheet : View {
+    public init(vm: StatusReviewer, given: StatusReviewer.ById) {
+        self.vm = vm;
+        self.given = given;
+    }
     
     public typealias BySection = [(JobApplicationState, [ApplicationStatusSnapshot])];
-    public typealias ById = [NSManagedObjectID : ApplicationStatusSnapshot];
     
-    @Binding var bySection: [(JobApplicationState, [ApplicationStatusSnapshot])];
-    @Binding var selection: Set<NSManagedObjectID>;
+    private let vm: StatusReviewer;
+    private let given: StatusReviewer.ById;
+    @State var bySection: StatusReviewerSheet.BySection = .init();
+    @State var selection: Set<NSManagedObjectID> = .init();
     
     @Environment(\.managedObjectContext) private var cx;
+    @Environment(\.calendar) private var calendar;
     @Environment(\.accessibilityReduceMotion) private var reduceMotion;
+    @Environment(\.dismiss) private var dismiss;
     
     private func move(ids: Set<NSManagedObjectID>, to: JobApplicationState) {
         var toAdd: [ApplicationStatusSnapshot] = [];
@@ -73,9 +79,16 @@ public struct StatusReviewPresenter : View {
         
         inspecting = cx.object(with: selection.first!) as? JobApplication;
     }
+    private func submit() {
+        let newData = StatusReviewerSheet.demangle(bySection: bySection);
+        dismiss();
+        
+        Task {
+            await vm.update(newData: newData, calendar: calendar, animated: !reduceMotion)
+        }
+    }
     
-    /// Turns the `[NSManagedObjectID : ApplicationStatusSnapshot]` into `[(JobApplicationState), [ApplicationStatusSnapshot])]`.
-    public nonisolated static func prepare(from: ById) -> BySection {
+    public nonisolated static func prepare(from: StatusReviewer.ById) -> BySection {
         var result: [(JobApplicationState, [ApplicationStatusSnapshot])] = JobApplicationState.allCases
             .sorted(using: KeyPathComparator(\.rawValue))
             .map { ($0, []) }
@@ -88,9 +101,8 @@ public struct StatusReviewPresenter : View {
         
         return result;
     }
-    /// Turns the `[(JobApplicationState), [ApplicationStatusSnapshot])]` into `[NSManagedObjectID : ApplicationStatusSnapshot]`.
-    public nonisolated static func demangle(bySection: BySection) -> ById {
-        var result = [NSManagedObjectID : ApplicationStatusSnapshot]();
+    public nonisolated static func demangle(bySection: BySection) -> StatusReviewer.ById {
+        var result = StatusReviewer.ById();
         
         for (_, snapshots) in bySection {
             for app in snapshots {
@@ -104,37 +116,39 @@ public struct StatusReviewPresenter : View {
     @State private var inspecting: JobApplication?;
     @State private var warning: SelectionWarningManifest = .init();
     
-    public var body: some View {
-        List(selection: $selection) {
-            ForEach(bySection, id: \.0) { (state, entries) in
-                Section(state.display) {
-                    ForEach(entries) { app in
-                        VStack(alignment: .leading) {
-                            HStack {
-                                if !app.didUpdate {
-                                    Circle()
-                                        .fill(Color.accentColor)
-                                        .frame(width: 7, height: 7)
-                                }
-                                
-                                Text(verbatim: "\(app.position) at \(app.company)")
-                            }
-                            
-                            if app.currentState != app.updateStateTo {
-                                HStack {
-                                    Text(app.currentState.display)
-                                    Image(systemName: "arrow.right")
-                                    Text(app.updateStateTo.display)
-                                }
-                            }
-                            else {
-                                Text(verbatim: "Last Updated \(app.lastUpdated.formatted(date: .numeric, time: .omitted))")
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
-                            }
-                        }
-                    }
+    @ViewBuilder
+    private func entryDisplay(app: ApplicationStatusSnapshot) -> some View {
+        VStack(alignment: .leading) {
+            HStack {
+                if !app.didUpdate {
+                    Circle()
+                        .fill(Color.accentColor)
+                        .frame(width: 7, height: 7)
                 }
+                
+                Text(verbatim: "\(app.position) at \(app.company)")
+            }
+            
+            if app.currentState != app.updateStateTo {
+                HStack {
+                    Text(app.currentState.display)
+                    Image(systemName: "arrow.right")
+                    Text(app.updateStateTo.display)
+                }
+            }
+            else {
+                Text(verbatim: "Last Updated \(app.lastUpdated.formatted(date: .numeric, time: .omitted))")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+        }
+    }
+    
+    @ViewBuilder
+    private var content: some View {
+        List(bySection, id: \.0, selection: $selection) { (state, entries) in
+            Section(state.display) {
+                ForEach(entries, content: entryDisplay)
             }
         }.contextMenu(forSelectionType: NSManagedObjectID.self) { selection in
             Section("Mark as") {
@@ -159,39 +173,44 @@ public struct StatusReviewPresenter : View {
             .sheet(item: $inspecting) { target in
                 ElementInspector(data: target)
             }
+            .frame(minHeight: 200, idealHeight: 250)
     }
-}
-
-#Preview {
-    @Previewable @State var given: [NSManagedObjectID : ApplicationStatusSnapshot] = Dictionary(
-        uniqueKeysWithValues: [
-        JobApplicationState.applied,
-        JobApplicationState.applied,
-        JobApplicationState.underReview,
-        JobApplicationState.inInterview
-    ].enumerated().map { (i, state) in
-        let id = NSManagedObjectID();
-        let targetDate = Calendar.current.date(byAdding: .day, value: -15, to: .now)!
-        
-        let state = ApplicationStatusSnapshot(
-            from: .init(
-                id: id,
-                position: "Position \(i + 1)",
-                company: "Company \(i + 1)",
-                current: state,
-                lastUpdate: targetDate
-            )
-        )
-        
-        return (id, state)
-    } )
-    @Previewable @State var bySection: [(JobApplicationState, [ApplicationStatusSnapshot])] = .init();
-    @Previewable @State var selection: Set<NSManagedObjectID> = .init();
     
+    @ViewBuilder
+    private var nothingToDo: some View {
+        Image(systemName: "moon")
+            .resizable()
+            .scaledToFit()
+            .frame(width: 90)
+            .padding()
+        
+        Text("You are all caught up!")
+            .font(.title2)
+        Text("Ghosted found no jobs to update")
+            .font(.caption)
+            .foregroundStyle(.secondary)
+    }
     
-    StatusReviewPresenter(
-        given: given,
-        bySection: $bySection,
-        selection: $selection
-    ).padding()
+    public var body: some View {
+        SheetBody("Follow Up Reminders") {
+            if given.isEmpty {
+                nothingToDo
+            }
+            else {
+                content
+            }
+        } actions: {
+            Button {
+                dismiss()
+            } label: {
+                Text("Cancel")
+            }.buttonStyle(.bordered)
+            
+            Button {
+                submit()
+            } label: {
+                Text("Save")
+            }.buttonStyle(.borderedProminent)
+        }
+    }
 }

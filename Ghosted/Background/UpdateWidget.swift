@@ -106,8 +106,10 @@ public final actor WidgetDataManager : Sendable {
         self.cancel = nil;
         self.onUpdate = onUpdate;
         
-        let vcx = using.viewContext;
-        self.cancel = await NotificationToken.createAsync(forName: .NSManagedObjectContextDidSave, object: vcx) { [weak self, log] note in
+        self.cancel = await NotificationToken.createAsync(
+            forName: .NSManagedObjectContextDidSave,
+            object: nil
+        ) { [weak self, log] note in
             log?.debug("Obtained notification, has self? \(self != nil)")
             Self.handleSave(log: log, note: note, inner: self)
         }
@@ -147,10 +149,13 @@ public final actor WidgetDataManager : Sendable {
         };
     }
     
-    // TODO: Write unit tests that determine if the system is working properly. 
-    
-    private func proccessChanges(update: [NSManagedObjectID], hadDeleted: Bool) async {
+    private func proccessChanges(update: [NSManagedObjectID], hadDeleted: Bool, fromContext: NSManagedObjectContext) async {
         let update = Set(update);
+        
+        guard fromContext.persistentStoreCoordinator == self.cx.persistentStoreCoordinator else {
+            log?.info("Got notification to update widget, but the persistent stores do not match. Ignoring.");
+            return;
+        }
         
         guard hadDeleted || !update.isEmpty else {
             log?.info("No applications were deleted or updated, so ignoring notification")
@@ -158,11 +163,6 @@ public final actor WidgetDataManager : Sendable {
         }
         
         let date = Date.now;
-        
-        /*
-         If we have deleted elements, we need to update regardless.
-         But, if we have updated elements, and they have
-         */
         
         let willUpdate: Bool;
         if hadDeleted {
@@ -215,6 +215,10 @@ public final actor WidgetDataManager : Sendable {
             log?.warning("Got notification to update widget information, but there is no payload.");
             return;
         }
+        guard let context = note.object as? NSManagedObjectContext else {
+            log?.info("No managed object context was given.")
+            return;
+        }
         
         log?.info("Processing message to update widgets, if target information is obtained.");
         
@@ -232,7 +236,7 @@ public final actor WidgetDataManager : Sendable {
         log?.info("Processing update widget message, got \(updatedTargets.count) updated, had deleted? \(hadDeleted)");
         
         Task {
-            await inner.proccessChanges(update: updatedTargets, hadDeleted: hadDeleted)
+            await inner.proccessChanges(update: updatedTargets, hadDeleted: hadDeleted, fromContext: context)
         }
     }
     

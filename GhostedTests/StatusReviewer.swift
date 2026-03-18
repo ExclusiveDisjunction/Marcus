@@ -157,9 +157,7 @@ struct StatusReviewerTests : Sendable {
                     let updatedDate = cal.startOfDay(for: targetObject.lastStatusUpdated ?? .distantPast);
                     
                     #expect(updatedDate == today)
-                    DispatchQueue.main.sync {
-                        #expect(targetObject.state == snapshot.updateStateTo)
-                    }
+                    #expect(targetObject.state == snapshot.updateStateTo)
                 }
             }
         }.value

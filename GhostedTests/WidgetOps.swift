@@ -75,9 +75,51 @@ struct WidgetOps {
         await manager.withUpdateAction { count in
             continuation.yield(count)
         }
-        var asyncIter = asyncStream.makeAsyncIterator();
+        
+        guard let twoDaysAgo = cal.date(byAdding: .day, value: -2, to: .now) else {
+            throw CocoaError(.validationInvalidDate);
+        }
         
         try await cx.perform { [cx] in
+            let newApp = JobApplication(context: cx);
+            newApp.company = "Test";
+            newApp.position = "test";
+            newApp.appliedOn = twoDaysAgo;
+            newApp.lastStatusUpdated = twoDaysAgo;
+            newApp.state = .applied;
+            newApp.location = "";
+            newApp.locationKind = .onSite;
+            
+            try cx.save();
+        }
+        
+        try await Task.sleep(for: .seconds(0.3)); //Ensure it is loaded
+        
+        // Since we do not update anything for today, we expect that this is never called.
+        let updatedCount = try await requireAsyncCall(
+            expectedCalls: 0,
+            desc: "Obtain the updated count",
+            timeout: 1.0) { complete in
+                var asyncIter = asyncStream.makeAsyncIterator();
+                
+                let count = await asyncIter.next();
+                complete();
+                return count;
+            };
+        
+        try #require(updatedCount == nil);
+    }
+    
+    @Test("forAddingAndDelete")
+    func forAddingAndDelete() async throws {
+        let (stack, cx, manager) = try await prepare();
+        
+        let (asyncStream, continuation) = AsyncStream<Int>.makeStream();
+        await manager.withUpdateAction { count in
+            continuation.yield(count)
+        }
+        
+        let id = try await cx.perform { [cx] in
             let newApp = JobApplication(context: cx);
             newApp.company = "Test";
             newApp.position = "test";
@@ -88,21 +130,107 @@ struct WidgetOps {
             newApp.locationKind = .onSite;
             
             try cx.save();
+            
+            return newApp.objectID;
         }
-        try stack.viewContext.save();
         
         try await Task.sleep(for: .seconds(0.3)); //Ensure it is loaded
-        let runExepctation = XCTestExpectation(description: "Obtain the updated count");
-        let runTask = Task { [runExepctation] in
+        var updatedCount = try await requireAsyncCall(
+            desc: "Obtain the updated count",
+            timeout: 10.0) { complete in
+                var asyncIter = asyncStream.makeAsyncIterator();
+                
+                let count = await asyncIter.next();
+                complete();
+                return count;
+            };
+        
+        try #require(updatedCount == 1);
+        
+        //Now remove the new element.
+        try await cx.perform { [cx, id] in
+            cx.delete( cx.object(with: id) )
+            
+            try cx.save();
+        }
+        
+        try await Task.sleep(for: .seconds(0.3)); //Ensure it is loaded
+        updatedCount = try await requireAsyncCall(
+            desc: "Obtain the updated count",
+            timeout: 10.0
+        ) { complete in
+            var asyncIter = asyncStream.makeAsyncIterator();
+            
             let count = await asyncIter.next();
-            runExepctation.fulfill();
+            complete();
             return count;
         };
         
-        let waitingResult = await XCTWaiter.fulfillment(of: [runExepctation], timeout: 10.0);
-        try #require( waitingResult == .completed );
-        
-        let expectedCount = await runTask.value;
-        
+        try #require(updatedCount == 0);
+    }
+}
+
+public enum AsyncWaitingError : Error {
+    case inner(any Error)
+    case timeout
+    case miscFailure
+    case expectedNoCalls
+}
+
+public struct AsyncCompletion : Sendable {
+    fileprivate init(_ inner: XCTestExpectation) {
+        self.inner = inner;
+    }
+    private let inner: XCTestExpectation;
+    
+    public func callAsFunction() {
+        inner.fulfill()
+    }
+}
+
+public func requireAsyncCall<T>(
+    expectedCalls: Int = 1,
+    desc: String? = nil,
+    timeout: TimeInterval,
+    performing: @Sendable @escaping (AsyncCompletion) async throws -> T
+) async throws -> T?
+where T: Sendable {
+    let expect = if let desc {
+        XCTestExpectation(description: desc);
+    }
+    else {
+        XCTestExpectation();
+    };
+    
+    if expectedCalls == 0 {
+        expect.isInverted = true;
+    }
+    else {
+        expect.expectedFulfillmentCount = expectedCalls;
+    }
+    
+    let task = Task { [expect, performing] in
+        try await performing(AsyncCompletion(expect))
+    };
+    
+    let waitingResult = await XCTWaiter.fulfillment(of: [expect], timeout: timeout);
+    if expectedCalls == 0 {
+        if waitingResult == .completed || waitingResult == .invertedFulfillment {
+            return nil;
+        }
+        else {
+            throw AsyncWaitingError.expectedNoCalls;
+        }
+    }
+    else {
+        if waitingResult == .completed {
+            return try await task.value;
+        }
+        else if waitingResult == .timedOut {
+            throw AsyncWaitingError.timeout;
+        }
+        else  {
+            throw AsyncWaitingError.miscFailure
+        }
     }
 }

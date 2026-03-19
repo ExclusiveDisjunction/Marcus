@@ -16,14 +16,6 @@ public struct JobApplicationEdit : View {
     @State private var rawUrl: String = "";
     @State private var urlError = false;
     
-#if os(macOS)
-    private let minWidth: CGFloat = 80;
-    private let maxWidth: CGFloat = 90;
-#else
-    private let minWidth: CGFloat = 110;
-    private let maxWidth: CGFloat = 120;
-#endif
-    
     public var body: some View {
         Form {
             Section {
@@ -53,37 +45,25 @@ public struct JobApplicationEdit : View {
             Section {
                 Toggle("Has Website?", isOn: $hasUrl)
                 
-                if hasUrl {
-                    TextField("Website", text: $rawUrl)
-                        .autocorrectionDisabled()
-                        .onChange(of: rawUrl) { _, raw in
-                            guard let url = URL(string: raw) else {
-                                urlError = true
-                                return;
-                            }
-                            
-                            urlError = false;
-                            source.website = url;
+                TextField("Website", text: $rawUrl)
+                    .autocorrectionDisabled()
+                    .disabled(!hasUrl)
+                    .opacity(hasUrl ? 1.0 : 0.5)
+                    .border(hasUrl ? Color.red : Color.clear)
+                    .onChange(of: rawUrl) { _, raw in
+                        guard let url = URL(string: raw) else {
+                            urlError = true
+                            return;
                         }
-                        .onChange(of: hasUrl) { _, hasUrl in
-                            if hasUrl {
-                                guard let url = URL(string: rawUrl) else {
-                                    urlError = true
-                                    return;
-                                }
-                                
-                                source.website = url;
-                            }
-                            else {
-                                source.website = nil;
-                            }
-                        }
-                    
-                    if urlError {
-                        Text("The URL provided is not valid")
-                            .foregroundStyle(.red)
+                        
+                        urlError = false;
+                        source.website = url;
                     }
-                }
+                    .onChange(of: hasUrl) { _, hasUrl in
+                        if !hasUrl {
+                            source.website = nil;
+                        }
+                    }
                 
                 TextField("Notes", text: $source.notes)
             }

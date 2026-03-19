@@ -115,7 +115,7 @@ public func scheduleBackgroundProcessing(forKind: BackgroundTasks, runOn date: D
         logger?.info("Background: Sucessfully submitted request for \(forKind)");
     }
     catch let e {
-        logger?.error("Background: Unable to request background work for \(forKind)");
+        logger?.error("Background: Unable to request background work for \(forKind) due to error \(e.localizedDescription)");
     }
 }
 

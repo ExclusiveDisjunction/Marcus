@@ -22,7 +22,7 @@ public func makeAppliedOnPredicate(forDate: Date, calendar: Calendar) -> NSPredi
         return nil;
     }
     
-    return NSPredicate(format: "internalAppliedOn BETWEEN %@", [begin as NSDate, end as NSDate]);
+    return NSPredicate(format: "internalAppliedOn BETWEEN {%@, %@}", begin as NSDate, end as NSDate);
 }
 
 @discardableResult

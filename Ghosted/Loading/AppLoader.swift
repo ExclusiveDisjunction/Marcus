@@ -116,6 +116,11 @@ public actor AppLoader {
         widgetUpdater = await WidgetDataManager(using: stack, calendar: .current, log: log);
         await widgetUpdater?.prepare(forDate: .now);
         
+#if os(iOS)
+        registerTask(logger: log, kind: .followUps);
+        scheduleBackgroundProcessing(forKind: .followUps, runOn: Date(timeIntervalSinceNow: 20), logger: log)
+#endif
+        
         log.info("Loading status reviewer");
         await handle.updatePhase(to: .reviewingApps, animated: animated);
         

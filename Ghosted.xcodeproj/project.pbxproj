@@ -80,20 +80,10 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
-				"Resources/1024x1/Icon-Draft2-iOS-ClearDark-1024x1024@1x.png",
-				"Resources/1024x1/Icon-Draft2-iOS-ClearLight-1024x1024@1x.png",
-				"Resources/1024x1/Icon-Draft2-iOS-Dark-1024x1024@1x.png",
-				"Resources/1024x1/Icon-Draft2-iOS-TintedDark-1024x1024@1x.png",
-				"Resources/1024x1/Icon-Draft2-iOS-TintedLight-1024x1024@1x.png",
 			);
 			platformFiltersByRelativePath = {
+				Background/Notifications.swift = (ios, );
 				Misc/FrostedWindowEffect.swift = (macos, );
-				"Resources/128x1/Icon-Draft2-iOS-Default-128x128@1x.png" = (macos, );
-				"Resources/16x1/Icon-Draft2-iOS-Default-16x16@1x.png" = (macos, );
-				"Resources/256x1/Icon-Draft2-iOS-Default-256x256@1x.png" = (macos, );
-				"Resources/32x1/Icon-Draft2-iOS-Default-32x32@1x.png" = (macos, );
-				"Resources/512x1/Icon-Draft2-iOS-Default-512x512@1x.png" = (macos, );
-				"Resources/64x1/Icon-Draft2-iOS-Default-64x64@1x.png" = (macos, );
 			};
 			target = DD10E6B62F549CDC0079483C /* Ghosted */;
 		};
@@ -557,6 +547,7 @@
 				INFOPLIST_FILE = Ghosted/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Ghosted;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Hollan Sellars (ExDisj) 2026";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -617,6 +608,7 @@
 				INFOPLIST_FILE = Ghosted/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Ghosted;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Hollan Sellars (ExDisj) 2026";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;

@@ -59,10 +59,8 @@ public extension DataStack {
     
     static func currentContainer() async throws -> DataStack {
 #if DEBUG
-        print("Doing debug container")
         return try await Self.debugContainer()
 #else
-        print("Doing standard container")
         return try await Self.standardContainer()
 #endif
     }

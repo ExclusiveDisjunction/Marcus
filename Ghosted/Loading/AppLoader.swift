@@ -87,11 +87,13 @@ public class AppLoadingHandle : ObservableObject {
 public actor AppLoader {
     public init(handle: AppLoadingHandle) {
         self.handle = handle;
-        self.log = Logger(subsystem: "com.exdisj.Ghosted", category: "App Loader")
+        self.log = Logger(subsystem: "com.exdisj.Ghosted", category: "App")
+        self.widgetUpdater = nil;
     }
     
     private let handle: AppLoadingHandle;
     private let log: Logger;
+    private var widgetUpdater: WidgetDataManager?;
     
     public func load(animated: Bool, beforeComplete: ((DataStack) async throws -> Void)? = nil) async {
         log.info("Begining app loading process.")
@@ -111,11 +113,13 @@ public actor AppLoader {
             return;
         }
         
+        widgetUpdater = await WidgetDataManager(using: stack, calendar: .current, log: log);
+        await widgetUpdater?.prepare(forDate: .now);
+        
         log.info("Loading status reviewer");
         await handle.updatePhase(to: .reviewingApps, animated: animated);
         
-        let appLogger = Logger(subsystem: "com.exdisj.Ghosted", category: "App")
-        let reviewer = StatusReviewer(container: stack, logger: appLogger);
+        let reviewer = StatusReviewer(container: stack, logger: log);
         
         log.info("Completed loading main components.");
         await handle.updatePhase(to: .wrappingUp, animated: animated);
@@ -131,7 +135,7 @@ public actor AppLoader {
         }
         
         log.info("Completed app loading");
-        let completed = LoadedAppState(stack: stack, reviewer: reviewer, logger: appLogger);
+        let completed = LoadedAppState(stack: stack, reviewer: reviewer, logger: log);
         try? await Task.sleep(for: .seconds(0.5)) //Reduces screen flickering
         await handle.withLoaded(loaded: completed, animated: animated);
     }

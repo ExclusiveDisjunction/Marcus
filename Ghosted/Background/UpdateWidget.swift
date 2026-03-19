@@ -59,14 +59,11 @@ public actor NotificationToken {
     
     @MainActor
     public init(_ inner: NSObjectProtocol, center: NotificationCenter) {
-        debugPrint("Opening notification token");
-        
         let token = InnerToken(token: inner);
         self.tokenBox = .init(initialState: token);
         self.center = center;
     }
     deinit {
-        debugPrint("Closing notification token")
         self.cancel()
     }
     
@@ -103,6 +100,7 @@ public final actor WidgetDataManager : Sendable {
         self.log = log;
         self.calendar = calendar;
         self.cx = using.newBackgroundContext();
+        self.cx.name = "WidgetDataManagerContext";
         self.cancel = nil;
         self.onUpdate = onUpdate;
         
@@ -110,11 +108,10 @@ public final actor WidgetDataManager : Sendable {
             forName: .NSManagedObjectContextDidSave,
             object: nil
         ) { [weak self, log] note in
-            log?.debug("Obtained notification, has self? \(self != nil)")
             Self.handleSave(log: log, note: note, inner: self)
         }
         
-        log?.info("Widget data manager is configured, listening for notifications.");
+        log?.info("WidgetUpdater: Widget data manager is configured, listening for notifications.");
     }
     
     private let log: Logger?;
@@ -135,7 +132,7 @@ public final actor WidgetDataManager : Sendable {
     private func determineIfApplicationsNeedUpdate(forDate: Date, update: Set<NSManagedObjectID>) async throws -> Bool {
         return try await cx.perform { [cx, calendar, log, update] in
             guard let datePred = makeAppliedOnPredicate(forDate: forDate, calendar: calendar) else {
-                log?.error("Unable to get date predicate for update.");
+                log?.error("WidgetUpdater: Unable to obtain date predicate for status check. Forcing full check.");
                 return true;
             }
             
@@ -153,12 +150,12 @@ public final actor WidgetDataManager : Sendable {
         let update = Set(update);
         
         guard fromContext.persistentStoreCoordinator == self.cx.persistentStoreCoordinator else {
-            log?.info("Got notification to update widget, but the persistent stores do not match. Ignoring.");
+            log?.warning("WidgetUpdater: Got notification to update, but the notifier is not of the current persistent store. Ignoring.");
             return;
         }
         
         guard hadDeleted || !update.isEmpty else {
-            log?.info("No applications were deleted or updated, so ignoring notification")
+            log?.info("WidgetUpdater: No applications were updated or deleted. Ignoring.");
             return;
         }
         
@@ -173,7 +170,7 @@ public final actor WidgetDataManager : Sendable {
                 willUpdate = try await determineIfApplicationsNeedUpdate(forDate: date, update: update);
             }
             catch let e {
-                log?.error("Unable to fetch application counts due to error \(e.localizedDescription)");
+                log?.error("WidgetUpdater: Unable to fetch application counts due to error \(e.localizedDescription)");
                 return;
             }
         }
@@ -184,20 +181,21 @@ public final actor WidgetDataManager : Sendable {
         let resultingCount: Int?;
         do {
             if willUpdate {
-                log?.info("Notification determined that an update is needed.");
+                log?.info("WidgetUpdater: For context \(fromContext.name ?? "(No Name)", privacy: .public), an update is needed, obtaining new count & updating widget.");
                 resultingCount = try await updateAppCountsWidget(cx: cx, forDate: date, calendar: calendar).count;
             }
             else {
-                log?.info("Notification determined that no update is needed.");
+                log?.info("WidgetUpdater: For context \(fromContext.name ?? "(No Name)", privacy: .public), an update is not needed. The widget will not be updated.");
                 resultingCount = nil;
             }
         }
         catch let e {
-            log?.error("Unable to update the widget due to error \(e)")
+            log?.error("WidgetUpdater: Unable to obtain new count, so the widget was not updated. Error: \(e.localizedDescription)")
             resultingCount = nil;
         }
         
         if let resultingCount = resultingCount {
+            log?.info("WidgetManager: For context \(fromContext.name ?? "(No Name)", privacy: .public), the widget was updated to contain count \(resultingCount)");
             if let postAction = self.onUpdate {
                 await postAction(resultingCount)
             }
@@ -208,19 +206,19 @@ public final actor WidgetDataManager : Sendable {
     
     private static nonisolated func handleSave(log: Logger?, note: Notification, inner: WidgetDataManager?) {
         guard let inner = inner else {
-            log?.warning("No widget manager to update, skipping notification.");
+            log?.warning("Global WidgetUpdater: No widget manager to update. Ignoring.");
             return;
         }
         guard let info = note.userInfo else {
-            log?.warning("Got notification to update widget information, but there is no payload.");
+            log?.warning("Global WidgetUpdater: Got notification to update widget information, but there is no payload. Ignoring.");
             return;
         }
         guard let context = note.object as? NSManagedObjectContext else {
-            log?.info("No managed object context was given.")
+            log?.warning("Global WidgetUpdater: No managed object context was given. Ignoring.")
             return;
         }
         
-        log?.info("Processing message to update widgets, if target information is obtained.");
+        log?.info("Global WidgetManager: Processing notification for context named \(context.name ?? "(No Name)", privacy: .public). Unpacking payload.");
         
         let inserted = (info[NSInsertedObjectsKey] as? Set<NSManagedObject>) ?? Set();
         let updated = (info[NSUpdatedObjectsKey] as? Set<NSManagedObject>) ?? Set();
@@ -233,7 +231,7 @@ public final actor WidgetDataManager : Sendable {
             .filter { $0.entity.name == "JobApplication" }
             .isEmpty
         
-        log?.info("Processing update widget message, got \(updatedTargets.count) updated, had deleted? \(hadDeleted)");
+        log?.info("Global WidgetManager: Processing notification, got \(updatedTargets.count) updated applications, were any deleted? \(hadDeleted). Passing message to specific WidgetManager.");
         
         Task {
             await inner.proccessChanges(update: updatedTargets, hadDeleted: hadDeleted, fromContext: context)
@@ -241,8 +239,18 @@ public final actor WidgetDataManager : Sendable {
     }
     
     @discardableResult
-    public func prepare(forDate: Date) async throws -> Int {
-        let result = try await updateAppCountsWidget(cx: cx, forDate: forDate, calendar: calendar).count;
+    public func prepare(forDate: Date) async -> Int? {
+        log?.info("WidgetManager: Preparing initial widget update.")
+        let result: Int;
+        do {
+            result = try await updateAppCountsWidget(cx: cx, forDate: forDate, calendar: calendar).count;
+        }
+        catch let e {
+            log?.error("WidgetManager: Unable to perform inital update due to error \(e.localizedDescription)");
+            return nil;
+        }
+        
+        log?.info("WidgetManager: Determined that there are \(result) applications completed today");
         
         if let postAction = self.onUpdate {
             await postAction(result)

@@ -16,15 +16,15 @@ import ExDisj
 @Observable
 public final class StatusReviewer : Sendable {
     /// Constructs the status reviewer from a container, creating a background context from it.
-    public init(container: DataStack, logger: Logger?) {
-        self.cx = container.newBackgroundContext();
-        self.log = logger;
+    public convenience init(container: DataStack, logger: Logger?) {
+        self.init(cx: container.newBackgroundContext(), logger: logger)
     }
     /// Constructs the status reviewer from `NSManagedObjectContext` instances.
     /// - Parameters:
     ///     - cx: The background thread model context, used to process and update information off the main thread.
     public init(cx: NSManagedObjectContext, logger: Logger?) {
         self.cx = cx;
+        self.cx.name = "StatusReviewerContext";
         self.log = logger;
     }
     

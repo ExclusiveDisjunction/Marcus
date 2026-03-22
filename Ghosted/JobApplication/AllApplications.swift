@@ -64,20 +64,24 @@ public struct AllApplications : View {
     public var body: some View {
         Table(context: applications) {
             TableColumn("Position", content: firstCol)
-                .width(min: 100, ideal: 150)
+                .width(min: 150)
             TableColumn("Company", value: \.company)
+                .width(min: 150)
             TableColumn("Applied On") { app in
                 Text(app.appliedOn.formatted(date: .numeric, time: .omitted))
-            }
+            }.width(min: 100)
             TableColumn("Status") { app in
                 DisplayableVisualizer(value: app.state)
                     .foregroundStyle(
                         showStatusColors && !applications.contains(app.id) ? app.state.color : Color.primary
                     )
-            }
+            }.width(min: 110)
             TableColumn("Location", value: \.location)
+                .width(min: 120)
             TableColumn("Location Kind", value: \.locationKind)
+                .width(min: 100)
             TableColumn("Position Kind", value: \.kind)
+                .width(min: 100)
         }.padding()
             .contextMenu(forSelectionType: JobApplication.ID.self) { selection in
                 SelectionContextMenu(
